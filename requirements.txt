@@ -1,0 +1,12 @@
+dash==0.42.0
+dash_html_components==0.16.0
+mutagen==1.42.0
+numpy==1.16.3
+pandas==0.24.2
+dash_daq==0.1.4
+tqdm==4.31.1
+Flask==1.0.2
+Keras==2.2.4
+dash_core_components==0.47.0
+librosa==0.6.3
+Pillow==6.0.0
