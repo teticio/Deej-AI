@@ -44,7 +44,7 @@ Once you have installed the required python packages with
 pip install -r requirements.txt
 ```
 
-you can process your library of MP3s (and M4As). Simply run the following command and wait...
+and [downloaded](https://drive.google.com/file/d/1LM1WW1GCGKeFD1AAHS8ijNwahqH4r4xV/view?usp=sharing) the model weights to the same directory, you can process your library of MP3s (and M4As). Simply run the following command and wait...
 
 
 ```python
