@@ -32,9 +32,9 @@ Certainly, given the limitations of data, computing power and time, I think that
 
 ### Applications
 
-Apart from the original idea of an automatic (radio as opposed to club) DJ, there are several other interesting things you can do. For example, as the vector mapping is continuous, you can easily create a playlist which smoothly "joins the dots" between one song and another, passing through as many waypoints as you like. For example, you could travel from soul to techno via funk and drum 'n' bass. Or from rock to opera :-).
+Apart from the original idea of an automatic (radio as opposed to club) DJ, there are several other interesting things you can do. For example, as the vector mapping is continuous, you can easily create a playlist which smoothly "[joins the dots](notebooks/Join_the_dots.ipynb)" between one song and another, passing through as many waypoints as you like. For example, you could travel from soul to techno via funk and drum 'n' bass. Or from rock to opera :-).
 
-Another simple idea is to listen to music using a microphone and to propose a set of next songs to play on the fly. Rather than comparing with the overall MP3ToVec, it might be more appropriate to just take into account the beginning of each song, so that the music segues more naturally from one track to another.
+Another simple idea is to listen to music using a microphone and to propose a set of next songs to play [on the fly](notebooks/Live.ipynb). Rather than comparing with the overall MP3ToVec, it might be more appropriate to just take into account the beginning of each song, so that the music segues more naturally from one track to another.
 
 ### Try it out for yourself
 
