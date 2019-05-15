@@ -275,7 +275,7 @@ def get_track_info(filename):
             audio = ID3(filename)
             if audio.get('APIC:') is not None:
                 pict = audio.get('APIC:').data
-                im = Image.open(BytesIO(pict))
+                im = Image.open(BytesIO(pict)).convert('RGB')
                 buff = BytesIO()
                 im.save(buff, format='jpeg')
                 artwork = base64.b64encode(buff.getvalue()).decode('utf-8')
@@ -292,7 +292,7 @@ def get_track_info(filename):
         audio = MP4(filename)
         if audio.get("covr") is not None:
             pict = audio.get("covr")[0]
-            im = Image.open(BytesIO(pict))
+            im = Image.open(BytesIO(pict)).convert('RGB')
             buff = BytesIO()
             im.save(buff, format='jpeg')
             artwork = base64.b64encode(buff.getvalue()).decode('utf-8')
