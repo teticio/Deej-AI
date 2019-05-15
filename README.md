@@ -32,7 +32,7 @@ Certainly, given the limitations of data, computing power and time, I think that
 
 ### Applications
 
-Apart from the original idea of an automatic (radio as opposed to club) DJ, there are several other interesting things you can do. For example, as the vector mapping is continuous, you can easily create a playlist which smoothly "[joins the dots](notebooks/Join_the_dots.ipynb)" between one song and another, passing through as many waypoints as you like. For example, you could travel from soul to techno via funk and drum 'n' bass. Or from rock to opera :-).
+Apart from the original idea of an automatic (radio as opposed to club) DJ, there are several other interesting things you can do. For example, as the vector mapping is continuous, you can easily create a playlist which smoothly "[joins the dots](notebooks/Join_the_dots.ipynb)" between one song and another, passing through as many waypoints as you like. For example, you could travel from [soul to techno via funk and drum 'n' bass](https://soundcloud.com/teticio/mix-automatically-created-with-artificial-intelligence-deej-ai). Or from rock to opera :-).
 
 Another simple idea is to listen to music using a microphone and to propose a set of next songs to play [on the fly](notebooks/Live.ipynb). Rather than comparing with the overall MP3ToVec, it might be more appropriate to just take into account the beginning of each song, so that the music segues more naturally from one track to another.
 
@@ -58,3 +58,5 @@ python Deej-A.I.py Pickles mp3tovec
 ```
 
 Then go to [http://localhost:8050](http://localhost:8050) in your browser.  If you add the parameter `--demo 5`, you don't have to wait until the end of each song. Finally, there are a couple of controls you can fiddle with (as it is currently programmed, these only take effect after the next song if one is already playing). "Keep on" determines the number of previous tracks to take into account in the generation of the playlist and "Drunk" specifies how much randomness to throw into the mix.
+
+If you are interested in the data I used to train the neural network, feel free to drop me an [email](mailto:teticio@gmail.com).
