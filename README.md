@@ -1,4 +1,4 @@
-![](.\MBIT_logo.png)
+![](MBIT_logo.png)
 
 # Deej-A.I.
 
