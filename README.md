@@ -59,6 +59,6 @@ It will create a directory called "Pickles" and, within the subdirectory "mp3tov
 python Deej-A.I.py Pickles mp3tovec
 ```
 
-Then go to [http://localhost:8050](http://localhost:8050) in your browser.  If you add the parameter `--demo 5`, you don't have to wait until the end of each song. Finally, there are a couple of controls you can fiddle with (as it is currently programmed, these only take effect after the next song if one is already playing). "Keep on" determines the number of previous tracks to take into account in the generation of the playlist and "Drunk" specifies how much randomness to throw into the mix.
+Then go to [http://localhost:8050](http://localhost:8050) in your browser.  If you add the parameter `--demo 5`, you don't have to wait until the end of each song. Simply load an MP3 or M4A on which you wish to base the playlist; it doesn't necessarily have to be one from your music library. Finally, there are a couple of controls you can fiddle with (as it is currently programmed, these only take effect after the next song if one is already playing). "Keep on" determines the number of previous tracks to take into account in the generation of the playlist and "Drunk" specifies how much randomness to throw into the mix.
 
 If you are interested in the data I used to train the neural network, feel free to drop me an [email](mailto:teticio@gmail.com).
