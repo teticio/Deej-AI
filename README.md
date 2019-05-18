@@ -59,6 +59,12 @@ It will create a directory called "Pickles" and, within the subdirectory "mp3tov
 python Deej-A.I.py Pickles mp3tovec
 ```
 
-Then go to [http://localhost:8050](http://localhost:8050) in your browser.  If you add the parameter `--demo 5`, you don't have to wait until the end of each song. Simply load an MP3 or M4A on which you wish to base the playlist; it doesn't necessarily have to be one from your music library. Finally, there are a couple of controls you can fiddle with (as it is currently programmed, these only take effect after the next song if one is already playing). "Keep on" determines the number of previous tracks to take into account in the generation of the playlist and "Drunk" specifies how much randomness to throw into the mix.
+Then go to [http://localhost:8050](http://localhost:8050) in your browser.  If you add the parameter `--demo 5`, you don't have to wait until the end of each song. Simply load an MP3 or M4A on which you wish to base the playlist; it doesn't necessarily have to be one from your music library. Finally, there are a couple of controls you can fiddle with (as it is currently programmed, these only take effect after the next song if one is already playing). "Keep on" determines the number of previous tracks to take into account in the generation of the playlist and "Drunk" specifies how much randomness to throw into the mix. Alternatively, you can create an MP3 mix of a musical journey of your choosing with
+
+```bash
+python Join_the_dots.py Pickles\mp3tovecs\mp3tovec.p tracks.txt mix.mp3 9
+```
+
+where "tracks.txt" is a textfile containing a list of MP3 or M4A files and, here, 9 is the number of additional tracks you want to generate between each of these.
 
 If you are interested in the data I used to train the neural network, feel free to drop me an [email](mailto:teticio@gmail.com).
