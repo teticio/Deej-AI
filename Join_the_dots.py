@@ -87,7 +87,7 @@ if __name__ == '__main__':
     print(f'Creating mix {mix_filename}')
     pipe = sp.Popen(['ffmpeg',
                     '-y', # replace if exists
-                    '-i', 'meta_data.txt'] + # use this meta data
+                    '-i', 'static/meta_data.txt'] + # use this meta data
                     tracks + # append playlist tracks
                     ['-filter_complex', f'loudnorm=I=-14,concat=n={len(playlist)}:v=0:a=1[out]', # normalize and concatenate
                     '-map', '[out]', # final output
