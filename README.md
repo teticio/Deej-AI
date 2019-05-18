@@ -50,7 +50,7 @@ and [downloaded](https://drive.google.com/file/d/1LM1WW1GCGKeFD1AAHS8ijNwahqH4r4
 
 
 ```bash
-python Mp3ToVec.py Pickles mp3tovec --scan c:/your_music_library
+python MP3ToVec.py Pickles mp3tovec --scan c:/your_music_library
 ```
 
 It will create a directory called "Pickles" and, within the subdirectory "mp3tovecs" a file called "mp3tovec.p". Once this has completed, you can try it out with
