@@ -1,4 +1,3 @@
-from __future__ import print_function, division
 import keras
 from keras.models import load_model
 import os
