@@ -1,4 +1,3 @@
-from __future__ import print_function, division
 import dash
 from dash.dependencies import Input, Output, State
 import dash_daq as daq
