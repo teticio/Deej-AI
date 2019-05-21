@@ -82,7 +82,7 @@ if __name__ == '__main__':
                 user_input = input('Input track number to add, 0 to finish, or search keywords: ')
                 if user_input == '0':
                     break
-                if user_input.isdigit():
+                if user_input.isdigit() and len(tracks) > 0:
                     if int(user_input)-1 >= len(tracks):
                         continue
                     input_tracks.append(tracks[int(user_input)-1])
