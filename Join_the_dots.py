@@ -54,7 +54,7 @@ def join_the_dots(tracks, n=5, noise=0): # create a musical journey between give
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('mp3tovec', type=str, help='MP3ToVecs file (full path)')
-    parser.add_argument('inputs', type=str, help='Text file with list of songs')
+    parser.add_argument('--inputs', type=str, help='Text file with list of songs')
     parser.add_argument('output', type=str, help='Output MP3 filename')
     parser.add_argument('n', type=int, help='Number of songs to add between input songs')
     parser.add_argument('--noise', type=float, help='Degree of randomness (0-1)')
@@ -68,9 +68,30 @@ if __name__ == '__main__':
     if args.noise is not None:
         noise = args.noise
     input_tracks = []
-    with open(tracks_filename, 'rt') as file:
-        for track in file:
-            input_tracks.append(track.replace('\n',''))
+    if tracks_filename is not None:
+        with open(tracks_filename, 'rt') as file:
+            for track in file:
+                input_tracks.append(track.replace('\n',''))
+    else:
+        user_input = input('Search keywords: ')
+        while True:
+            tracks = [mp3 for mp3 in mp3tovec if mp3.lower().find(user_input) != -1]
+            for i, track in enumerate(tracks):
+                print(f'{i+1}. {track}')
+            while True:
+                user_input = input('Input track number to add, 0 to finish, or search keywords: ')
+                if user_input == '0':
+                    break
+                if user_input.isdigit():
+                    if int(user_input) >= len(tracks):
+                        continue
+                    input_tracks.append(tracks[int(user_input)])
+                    print(f'Added {tracks[int(user_input)]} to playlist')
+                else:
+                    break
+            if user_input == '0':
+                break
+        print()
     total_duration = 0
     playlist = join_the_dots(input_tracks, n=n, noise=noise)
     tracks = []
