@@ -83,10 +83,10 @@ if __name__ == '__main__':
                 if user_input == '0':
                     break
                 if user_input.isdigit():
-                    if int(user_input) >= len(tracks):
+                    if int(user_input)-1 >= len(tracks):
                         continue
-                    input_tracks.append(tracks[int(user_input)])
-                    print(f'Added {tracks[int(user_input)]} to playlist')
+                    input_tracks.append(tracks[int(user_input)-1])
+                    print(f'Added {tracks[int(user_input)-1]} to playlist')
                 else:
                     break
             if user_input == '0':
