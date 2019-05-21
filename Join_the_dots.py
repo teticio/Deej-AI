@@ -75,7 +75,7 @@ if __name__ == '__main__':
     else:
         user_input = input('Search keywords: ')
         while True:
-            tracks = [mp3 for mp3 in mp3tovec if mp3.lower().find(user_input) != -1]
+            tracks = [mp3 for mp3 in mp3tovec if mp3.lower().find(user_input.lower()) != -1]
             for i, track in enumerate(tracks):
                 print(f'{i+1}. {track}')
             while True:
