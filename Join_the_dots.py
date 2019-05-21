@@ -32,7 +32,7 @@ def most_similar_by_vec(positive=[], negative=[], topn=5, noise=0):
 
 def join_the_dots(tracks, n=5, noise=0): # create a musical journey between given track "waypoints"
     playlist = []
-    start = tracks[0]
+    end = start = tracks[0]
     start_vec = mp3tovec[start]
     for end in tracks[1:]:
         end_vec = mp3tovec[end]
@@ -99,7 +99,7 @@ if __name__ == '__main__':
         tracks.append('-i')
         tracks.append(track)
         total_duration += get_track_duration(track)
-        if i % n == 0:
+        if n == 0 or i % n == 0:
             print(f'* {track}')
         else:
             print(f'{track}')
