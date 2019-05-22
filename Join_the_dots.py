@@ -5,6 +5,7 @@ from mutagen.mp4 import MP4
 from mutagen.id3 import ID3, ID3NoHeaderError
 import subprocess as sp
 import argparse
+import re
 
 max_duration = 10 * 60 # avoid adding mixes to mix
 
@@ -75,7 +76,7 @@ if __name__ == '__main__':
     else:
         user_input = input('Search keywords: ')
         while True:
-            tracks = [mp3 for mp3 in mp3tovec if mp3.lower().find(user_input.lower()) != -1]
+            tracks = sorted([mp3 for mp3 in mp3tovec if all(word in mp3.lower() for word in user_input.lower().split())])
             for i, track in enumerate(tracks):
                 print(f'{i+1}. {track}')
             while True:
