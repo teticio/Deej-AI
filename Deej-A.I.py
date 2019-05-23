@@ -205,7 +205,7 @@ def make_playlist(seed_tracks, size=10, lookback=3, noise=0):
         similar = most_similar(positive=playlist[-lookback:], topn=max_tries, noise=noise)
         candidates = [candidate[0] for candidate in similar if candidate[0] != playlist[-1]]
         for candidate in candidates:
-            if not candidate in playlist and get_track_duration(candidate) < max_duration:
+            if not candidate in playlist:
                 break
         playlist.append(candidate)
     return playlist
