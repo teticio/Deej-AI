@@ -48,7 +48,7 @@ def most_similar_by_vec(positive=[], negative=[], topn=5, noise=0):
         similar.append((track_j, cos_proximity))
     return sorted(similar, key=lambda x:-x[1])[:topn]
 
-def make_playlist(seed_tracks, size=10, lookback=3, noise=0.01):
+def make_playlist(seed_tracks, size=10, lookback=3, noise=0):
     max_tries = 10
     playlist = seed_tracks
     while len(playlist) < size:
