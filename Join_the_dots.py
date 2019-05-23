@@ -4,6 +4,7 @@ from mutagen.mp3 import MP3
 from mutagen.mp4 import MP4
 from mutagen.id3 import ID3, ID3NoHeaderError
 import subprocess as sp
+import random
 import argparse
 import re
 
@@ -16,6 +17,22 @@ def get_track_duration(filename):
     elif filename[-3:].lower() == 'm4a':
         duration = MP4(filename).info.length
     return duration
+
+def most_similar(positive=[], negative=[], topn=5, noise=0):
+    if isinstance(positive, str):
+        positive = [positive] # broadcast to list
+    if isinstance(negative, str):
+        negative = [negative] # broadcast to list
+    mp3_vec_i = np.sum([mp3tovec[i] for i in positive] + [-mp3tovec[i] for i in negative], axis=0)
+    mp3_vec_i += np.random.normal(0, noise * np.linalg.norm(mp3_vec_i), len(mp3_vec_i))
+    similar = []
+    for track_j in mp3tovec:
+        if track_j in positive or track_j in negative:
+            continue
+        mp3_vec_j = mp3tovec[track_j]
+        cos_proximity = np.dot(mp3_vec_i, mp3_vec_j) / (np.linalg.norm(mp3_vec_i) * np.linalg.norm(mp3_vec_j))
+        similar.append((track_j, cos_proximity))
+    return sorted(similar, key=lambda x:-x[1])[:topn]
 
 def most_similar_by_vec(positive=[], negative=[], topn=5, noise=0):
     if isinstance(positive, str):
@@ -30,6 +47,18 @@ def most_similar_by_vec(positive=[], negative=[], topn=5, noise=0):
         cos_proximity = np.dot(mp3_vec_i, mp3_vec_j) / (np.linalg.norm(mp3_vec_i) * np.linalg.norm(mp3_vec_j))
         similar.append((track_j, cos_proximity))
     return sorted(similar, key=lambda x:-x[1])[:topn]
+
+def make_playlist(seed_tracks, size=10, lookback=3, noise=0.01):
+    max_tries = 10
+    playlist = seed_tracks
+    while len(playlist) < size:
+        similar = most_similar(positive=playlist[-lookback:], topn=max_tries+2, noise=noise)
+        candidates = [candidate[0] for candidate in similar if candidate[0] != playlist[-1]]
+        for i in range(max_tries):
+            if not candidates[i] in playlist:
+                break
+        playlist.append(candidates[i])
+    return playlist
 
 def join_the_dots(tracks, n=5, noise=0): # create a musical journey between given track "waypoints"
     playlist = []
@@ -94,13 +123,18 @@ if __name__ == '__main__':
                 break
         print()
     total_duration = 0
-    playlist = join_the_dots(input_tracks, n=n, noise=noise)
+    if len(input_tracks) == 0:
+        input_tracks.append(tracks[random.randint(0, len(tracks))])
+    if len(input_tracks) > 1:
+        playlist = join_the_dots(input_tracks, n=n, noise=noise)
+    else:
+        playlist = make_playlist(input_tracks, size=n, lookback=3, noise=noise)
     tracks = []
     for i, track in enumerate(playlist):
         tracks.append('-i')
         tracks.append(track)
         total_duration += get_track_duration(track)
-        if n == 0 or i % n == 0:
+        if n == 0 and i == 0 or n != 0 and i % n == 0:
             print(f'* {track}')
         else:
             print(f'{track}')
