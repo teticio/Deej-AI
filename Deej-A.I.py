@@ -198,16 +198,16 @@ def most_similar_by_vec(positive=[], negative=[], topn=5, noise=0):
         similar.append((track_j, cos_proximity))
     return sorted(similar, key=lambda x:-x[1])[:topn]
 
-def make_playlist(seed_tracks, size=10, lookback=3, noise=0):
+def make_playlist(seed_tracks, size=10, lookback=3, noise=0.01):
     max_tries = 10
     playlist = seed_tracks
     while len(playlist) < size:
-        similar = most_similar(positive=playlist[-lookback:], topn=max_tries+2, noise=noise)
+        similar = most_similar(positive=playlist[-lookback:], topn=max_tries, noise=noise)
         candidates = [candidate[0] for candidate in similar if candidate[0] != playlist[-1]]
-        for i in range(max_tries):
-            if not candidates[i] in playlist:
+        for candidate in candidates:
+            if not candidate in playlist and get_track_duration(candidate) < max_duration:
                 break
-        playlist.append(candidates[i])
+        playlist.append(candidate)
     return playlist
 
 def get_mp3tovec(content_string, filename):

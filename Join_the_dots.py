@@ -52,15 +52,16 @@ def make_playlist(seed_tracks, size=10, lookback=3, noise=0.01):
     max_tries = 10
     playlist = seed_tracks
     while len(playlist) < size:
-        similar = most_similar(positive=playlist[-lookback:], topn=max_tries+2, noise=noise)
+        similar = most_similar(positive=playlist[-lookback:], topn=max_tries, noise=noise)
         candidates = [candidate[0] for candidate in similar if candidate[0] != playlist[-1]]
-        for i in range(max_tries):
-            if not candidates[i] in playlist:
+        for candidate in candidates:
+            if not candidate in playlist and get_track_duration(candidate) < max_duration:
                 break
-        playlist.append(candidates[i])
+        playlist.append(candidate)
     return playlist
 
 def join_the_dots(tracks, n=5, noise=0): # create a musical journey between given track "waypoints"
+    max_tries = 10
     playlist = []
     end = start = tracks[0]
     start_vec = mp3tovec[start]
@@ -68,14 +69,12 @@ def join_the_dots(tracks, n=5, noise=0): # create a musical journey between give
         end_vec = mp3tovec[end]
         playlist.append(start)
         for i in range(n-1):
-            candidates = most_similar_by_vec(positive=[(n-i+1)/n * start_vec + (i+1)/n * end_vec], topn=10, noise=noise)
-            for j in range(10):
-                if not candidates[j][0] in playlist \
-                        and candidates[j][0] != start \
-                        and candidates[j][0] != end \
-                        and get_track_duration(candidates[j][0]) < max_duration:
+            similar = most_similar_by_vec(positive=[(n-i+1)/n * start_vec + (i+1)/n * end_vec], topn=max_tries, noise=noise)
+            candidates = [candidate[0] for candidate in similar if candidate[0] != playlist[-1]]
+            for candidate in candidates:
+                if not candidate in playlist and candidate != end and get_track_duration(candidate) < max_duration:
                     break
-            playlist.append(candidates[j][0])
+            playlist.append(candidate)
         start = end
         start_vec = end_vec
     playlist.append(end)
@@ -124,6 +123,7 @@ if __name__ == '__main__':
         print()
     total_duration = 0
     if len(input_tracks) == 0:
+        tracks = [mp3 for mp3 in mp3tovec]
         input_tracks.append(tracks[random.randint(0, len(tracks))])
     if len(input_tracks) > 1:
         playlist = join_the_dots(input_tracks, n=n, noise=noise)
@@ -135,9 +135,9 @@ if __name__ == '__main__':
         tracks.append(track)
         total_duration += get_track_duration(track)
         if n == 0 and i == 0 or n != 0 and i % n == 0:
-            print(f'* {track}')
+            print(f'{i+1}.* {track}')
         else:
-            print(f'{track}')
+            print(f'{i+1}. {track}')
     print(f'Total duration = {total_duration//60//60:.0f}:{total_duration//60%60:02.0f}:{total_duration%60:02.0f}s')
     print('')
     print(f'Creating mix {mix_filename}')
