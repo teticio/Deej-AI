@@ -149,4 +149,6 @@ if __name__ == '__main__':
                     '-map', '[out]', # final output
                     mix_filename], # output file
                    stdin=sp.PIPE,stdout=sp.PIPE, stderr=sp.PIPE)
-    pipe.communicate()
+    out, err = pipe.communicate()
+    if pipe.returncode == 1 and err is not None:
+        print (err)
