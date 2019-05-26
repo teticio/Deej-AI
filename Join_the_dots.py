@@ -68,7 +68,7 @@ def join_the_dots(tracks, n=5, noise=0): # create a musical journey between give
     for end in tracks[1:]:
         end_vec = mp3tovec[end]
         playlist.append(start)
-        for i in range(n-1):
+        for i in range(n):
             similar = most_similar_by_vec(positive=[(n-i+1)/n * start_vec + (i+1)/n * end_vec], topn=max_tries, noise=noise)
             candidates = [candidate[0] for candidate in similar if candidate[0] != playlist[-1]]
             for candidate in candidates:
