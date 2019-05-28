@@ -120,9 +120,9 @@ if __name__ == '__main__':
         if playlist_id is None:
             print(f'Unable to access playlist {playlist_name} for user {username}')
     # download embeddings and tracks.csv if not exists here
-    mp3tovecs = pickle.load(open('Pickles_Spotify/spotifytovec.p', 'rb'))
-    tracktovecs = pickle.load(open('Pickles_Spotify/tracktovec.p', 'rb'))
-    tracks = pickle.load(open('notebooks/spotify_tracks.p', 'rb'))
+    mp3tovecs = pickle.load(open('spotifytovec.p', 'rb'))
+    tracktovecs = pickle.load(open('tracktovec.p', 'rb'))
+    tracks = pickle.load(open('spotify_tracks.p', 'rb'))
     if mp3_filename is None or user_mp3tovecs_filename is None:
         user_input = input('Search keywords: ')
         while True:
