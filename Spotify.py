@@ -12,6 +12,11 @@ import spotipy.util as util
 import webbrowser
 from tqdm import tqdm
 
+# Download the model data from here to the same directory 
+# https://drive.google.com/open?id=1geEALPQTRBNUvkpI08B-oN4vsIiDTb5I
+# https://drive.google.com/open?id=1Mg924qqF3iDgVW5w34m6Zaki5fNBdfSy
+# https://drive.google.com/open?id=1Qre4Lkym1n5UTpAveNl5ffxlaAmH1ntS
+
 # You can get credentials from https://developer.spotify.com/dashboard/applications
 scope = 'playlist-modify-public'
 client_id='fill this in with your details'
