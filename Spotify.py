@@ -11,6 +11,7 @@ import spotipy
 import spotipy.util as util
 import webbrowser
 from tqdm import tqdm
+from IPython.core.display import display, HTML
 
 # You can get credentials from https://developer.spotify.com/dashboard/applications
 scope = 'playlist-modify-public'
@@ -20,12 +21,15 @@ redirect_uri='fill this in with your details'
 
 epsilon_distance = 0.001
 
-def spotify_playlist(sp, username, playlist_id, track_details):
+def spotify_playlist(sp, username, playlist_id, track_details, output=False):
     with open("playlist.html", "w") as text_file:
         track_ids = [track_detail for track_detail in track_details]
         if sp is None or username is None or playlist_id is None:
             for track_detail in track_details:
-                text_file.write(f'<iframe src="https://open.spotify.com/embed/track/{track_detail}" width="100%" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>')
+                html = f'<iframe src="https://open.spotify.com/embed/track/{track_detail}" width="100%" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>'
+                text_file.write(html)
+                if output:
+                    display(HTML(html))
         else:
             try:
                 result = sp.user_playlist_replace_tracks(username, playlist_id, track_ids)
@@ -34,7 +38,11 @@ def spotify_playlist(sp, username, playlist_id, track_details):
                 token = util.prompt_for_user_token(username, scope, client_id, client_secret, redirect_uri)
                 sp = spotipy.Spotify(token)
                 result = sp.user_playlist_replace_tracks(username, playlist_id, track_ids)
-            text_file.write(f'<iframe src="https://open.spotify.com/embed/user/{username}/playlist/{playlist_id}" width="100%" height="100%" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>')
+            html = f'<iframe src="https://open.spotify.com/embed/user/{username}/playlist/{playlist_id}" width="100%" height="100%" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>'
+            text_file.write(html)
+            if output:
+                display(HTML(html))
+
 
 def most_similar(mp3tovecs, weights, positive=[], negative=[], topn=5, noise=0):
     if isinstance(positive, str):
@@ -89,6 +97,7 @@ if __name__ == '__main__':
     parser.add_argument('--noise', type=float, help='Degree of randomness (0-1, default 0)')
     parser.add_argument('--mp3', type=str, help='Start with sommething that sounds like this')
     parser.add_argument('--mp3tovec', type=str, help='MP3ToVecs file (full path)')
+    parser.add_argument('-o', action='store_true', help='output playlist')
     args = parser.parse_args()
     username = args.user
     playlist_name = args.playlist
@@ -98,6 +107,7 @@ if __name__ == '__main__':
     noise = args.noise
     mp3_filename = args.mp3
     user_mp3tovecs_filename = args.mp3tovec
+    output = args.o == True
     if size is None:
         size = 20
     if creativity is None:
@@ -138,7 +148,7 @@ if __name__ == '__main__':
                         continue
                     id = ids[int(user_input)-1]
                     playlist = make_playlist([mp3tovecs, tracktovecs], [creativity, 1-creativity], [id], size=size, lookback=lookback, noise=noise)
-                    spotify_playlist(sp, username, playlist_id, playlist)
+                    spotify_playlist(sp, username, playlist_id, playlist, output=output)
                     webbrowser.open('file://' + os.path.realpath('playlist.html'))
                 else:
                     break
@@ -152,5 +162,5 @@ if __name__ == '__main__':
         user_input = input('Input track number: ')
         if user_input.isdigit() and int(user_input) > 0 and int(user_input) < len(ids):
             playlist = make_playlist([mp3tovecs, tracktovecs], [creativity, 1-creativity], [ids[int(user_input)-1][0]], size=size, lookback=lookback, noise=noise)
-            spotify_playlist(sp, username, playlist_id, playlist)
+            spotify_playlist(sp, username, playlist_id, playlist, output=output)
             webbrowser.open('file://' + os.path.realpath('playlist.html'))
