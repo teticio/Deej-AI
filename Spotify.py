@@ -57,11 +57,14 @@ def most_similar(mp3tovecs, weights, positive=[], negative=[], topn=5, noise=0):
             similar[j] = (track_j, similar[j][1] + weights[i] * cos_proximity)
     return sorted(similar, key=lambda x:-x[1])[:topn]
 
-def most_similar_by_vec(mp3tovecs, weights, positives=[[]], negatives=[[]], topn=5, noise=0):
+def most_similar_by_vec(mp3tovecs, weights, positives=None, negatives=None, topn=5, noise=0):
     similar = [('', 0)] * len(mp3tovecs[0])
+    positive = negative = []
     for k, mp3tovec in enumerate(mp3tovecs):
-        positive = positives[k]
-        negative = negatives[k]
+        if positives is not None:
+            positive = positives[k]
+        if negatives is not None:
+            negative = negatives[k]
         if isinstance(positive, str):
             positive = [positive] # broadcast to list
         if isinstance(negative, str):
@@ -69,11 +72,11 @@ def most_similar_by_vec(mp3tovecs, weights, positives=[[]], negatives=[[]], topn
         mp3_vec_i = np.sum([i for i in positive] + [-i for i in negative], axis=0)
         mp3_vec_i += np.random.normal(0, noise * np.linalg.norm(mp3_vec_i), len(mp3_vec_i))
         similar = [('', 0)] * len(mp3tovecs[0])
-        for j, track_j in enumerate(mp3tovecs[0]):
-            mp3_vec_j = np.sum([mp3tovec[track_j] * weights[k] for k, mp3tovec in enumerate(mp3tovecs)], axis=0)
+        for j, track_j in enumerate(mp3tovec):
+            mp3_vec_j = mp3tovec[track_j]
             cos_proximity = np.dot(mp3_vec_i, mp3_vec_j) / (np.linalg.norm(mp3_vec_i) * np.linalg.norm(mp3_vec_j))
             similar[j] = (track_j, similar[j][1] + weights[k] * cos_proximity)
-        return sorted(similar, key=lambda x:-x[1])[:topn]
+    return sorted(similar, key=lambda x:-x[1])[:topn]
 
 def join_the_dots(mp3tovecs, weights, ids, n=5, noise=0): # create a musical journey between given track "waypoints"
     max_tries = 10
