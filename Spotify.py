@@ -12,10 +12,15 @@ import spotipy.util as util
 import webbrowser
 import random
 
-scope = 'playlist-modify-public'
-client_id='194086cb37be48ebb45b9ba4ce4c5936'
-client_secret='fb9fb4957a9841fcb5b2dbc7804e1e85'
-redirect_uri='https://www.attentioncoach.es/'
+# Download the model data from here to the same directory 
+# https://drive.google.com/open?id=1geEALPQTRBNUvkpI08B-oN4vsIiDTb5I
+# https://drive.google.com/open?id=1Mg924qqF3iDgVW5w34m6Zaki5fNBdfSy
+# https://drive.google.com/open?id=1Qre4Lkym1n5UTpAveNl5ffxlaAmH1ntS
+
+# You can get credentials from https://developer.spotify.com/dashboard/applicationsscope = 'playlist-modify-public'
+client_id='fill this in with your details'
+client_secret='fill this in with your details'
+redirect_uri='fill this in with your details'
 
 epsilon_distance = 0.001
 
