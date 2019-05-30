@@ -71,7 +71,6 @@ def most_similar_by_vec(mp3tovecs, weights, positives=None, negatives=None, topn
             negative = [negative] # broadcast to list
         mp3_vec_i = np.sum([i for i in positive] + [-i for i in negative], axis=0)
         mp3_vec_i += np.random.normal(0, noise * np.linalg.norm(mp3_vec_i), len(mp3_vec_i))
-        similar = [('', 0)] * len(mp3tovecs[0])
         for j, track_j in enumerate(mp3tovec):
             mp3_vec_j = mp3tovec[track_j]
             cos_proximity = np.dot(mp3_vec_i, mp3_vec_j) / (np.linalg.norm(mp3_vec_i) * np.linalg.norm(mp3_vec_j))
