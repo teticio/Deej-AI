@@ -10,18 +10,12 @@ import argparse
 import spotipy
 import spotipy.util as util
 import webbrowser
-from tqdm import tqdm
+import random
 
-# Download the model data from here to the same directory 
-# https://drive.google.com/open?id=1geEALPQTRBNUvkpI08B-oN4vsIiDTb5I
-# https://drive.google.com/open?id=1Mg924qqF3iDgVW5w34m6Zaki5fNBdfSy
-# https://drive.google.com/open?id=1Qre4Lkym1n5UTpAveNl5ffxlaAmH1ntS
-
-# You can get credentials from https://developer.spotify.com/dashboard/applications
 scope = 'playlist-modify-public'
-client_id='fill this in with your details'
-client_secret='fill this in with your details'
-redirect_uri='fill this in with your details'
+client_id='194086cb37be48ebb45b9ba4ce4c5936'
+client_secret='fb9fb4957a9841fcb5b2dbc7804e1e85'
+redirect_uri='https://www.attentioncoach.es/'
 
 epsilon_distance = 0.001
 
@@ -58,37 +52,67 @@ def most_similar(mp3tovecs, weights, positive=[], negative=[], topn=5, noise=0):
             similar[j] = (track_j, similar[j][1] + weights[i] * cos_proximity)
     return sorted(similar, key=lambda x:-x[1])[:topn]
 
+def most_similar_by_vec(mp3tovecs, weights, positives=[[]], negatives=[[]], topn=5, noise=0):
+    similar = [('', 0)] * len(mp3tovecs[0])
+    for k, mp3tovec in enumerate(mp3tovecs):
+        positive = positives[k]
+        negative = negatives[k]
+        if isinstance(positive, str):
+            positive = [positive] # broadcast to list
+        if isinstance(negative, str):
+            negative = [negative] # broadcast to list
+        mp3_vec_i = np.sum([i for i in positive] + [-i for i in negative], axis=0)
+        mp3_vec_i += np.random.normal(0, noise * np.linalg.norm(mp3_vec_i), len(mp3_vec_i))
+        similar = [('', 0)] * len(mp3tovecs[0])
+        for j, track_j in enumerate(mp3tovecs[0]):
+            mp3_vec_j = np.sum([mp3tovec[track_j] * weights[k] for k, mp3tovec in enumerate(mp3tovecs)], axis=0)
+            cos_proximity = np.dot(mp3_vec_i, mp3_vec_j) / (np.linalg.norm(mp3_vec_i) * np.linalg.norm(mp3_vec_j))
+            similar[j] = (track_j, similar[j][1] + weights[k] * cos_proximity)
+        return sorted(similar, key=lambda x:-x[1])[:topn]
+
+def join_the_dots(mp3tovecs, weights, ids, n=5, noise=0): # create a musical journey between given track "waypoints"
+    max_tries = 10
+    playlist = []
+    end = start = ids[0]
+    start_vec = [mp3tovec[start] for k, mp3tovec in enumerate(mp3tovecs)]
+    for end in ids[1:]:
+        end_vec = [mp3tovec[end] for k, mp3tovec in enumerate(mp3tovecs)]
+        playlist.append(start)
+        print(f'{len(playlist)}.* {tracks[playlist[-1]]}')
+        for i in range(n):
+            similar = most_similar_by_vec(mp3tovecs, weights, positives=[[(n-i+1)/n * start_vec[k] + (i+1)/n * end_vec[k]] for k in range(len(mp3tovecs))], topn=max_tries, noise=noise)
+            candidates = [candidate[0] for candidate in similar if candidate[0] != playlist[-1]]
+            for candidate in candidates:
+                if not candidate in playlist and candidate != end:
+                    break
+            playlist.append(candidate)
+            print(f'{len(playlist)}. {tracks[playlist[-1]]}')
+        start = end
+        start_vec = end_vec
+    playlist.append(end)
+    print(f'{len(playlist)}.* {tracks[playlist[-1]]}')
+    return playlist
+
 def make_playlist(mp3tovecs, weights, seed_tracks, size=10, lookback=3, noise=0):
     max_tries = 10
     playlist = seed_tracks
-    for i in tqdm(range(len(seed_tracks), size)):
+    for i in range(0, len(seed_tracks)):
+        print(f'{i+1}.* {tracks[seed_tracks[i]]}')
+    for i in range(len(seed_tracks), size):
         similar = most_similar(mp3tovecs, weights, positive=playlist[-lookback:], topn=max_tries, noise=noise)
         candidates = [candidate[0] for candidate in similar if candidate[0] != playlist[-1]]
         for candidate in candidates:
             if not candidate in playlist:
                 break
         playlist.append(candidate)
+        print(f'{i+1}. {tracks[playlist[-1]]}')
     return playlist
-
-def most_similar_by_vec(mp3tovec, positive=[], negative=[], topn=5, noise=0):
-    if isinstance(positive, str):
-        positive = [positive] # broadcast to list
-    if isinstance(negative, str):
-        negative = [negative] # broadcast to list
-    mp3_vec_i = np.sum([i for i in positive] + [-i for i in negative], axis=0)
-    mp3_vec_i += np.random.normal(0, noise * np.linalg.norm(mp3_vec_i), len(mp3_vec_i))
-    similar = []
-    for track_j in mp3tovec:
-        mp3_vec_j = mp3tovec[track_j]
-        cos_proximity = np.dot(mp3_vec_i, mp3_vec_j) / (np.linalg.norm(mp3_vec_i) * np.linalg.norm(mp3_vec_j))
-        similar.append((track_j, cos_proximity))
-    return sorted(similar, key=lambda x:-x[1])[:topn]
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--user', type=str, help='Spotify username')
     parser.add_argument('--playlist', type=str, help='Playlist name (must already exist')
-    parser.add_argument('--n', type=int, help='Size of playlist to generate (default 20)')
+    parser.add_argument('--n', type=int, help='Size of playlist to generate (default 5)')
     parser.add_argument('--creativity', type=float, help='Discover something new? (0-1, default 0.5)')
     parser.add_argument('--lookback', type=int, help='Number of previous tracks to consider (default 3)')
     parser.add_argument('--noise', type=float, help='Degree of randomness (0-1, default 0)')
@@ -104,7 +128,7 @@ if __name__ == '__main__':
     mp3_filename = args.mp3
     user_mp3tovecs_filename = args.mp3tovec
     if size is None:
-        size = 20
+        size = 5
     if creativity is None:
         creativity = 0.5
     if lookback is None:
@@ -125,30 +149,40 @@ if __name__ == '__main__':
         if playlist_id is None:
             print(f'Unable to access playlist {playlist_name} for user {username}')
     # download embeddings and tracks.csv if not exists here
-    mp3tovecs = pickle.load(open('spotifytovec.p', 'rb'))
-    tracktovecs = pickle.load(open('tracktovec.p', 'rb'))
-    tracks = pickle.load(open('spotify_tracks.p', 'rb'))
+    mp3tovecs = pickle.load(open('Pickles_Spotify/spotifytovec.p', 'rb'))
+    tracktovecs = pickle.load(open('Pickles_Spotify/tracktovec.p', 'rb'))
+    tracks = pickle.load(open('notebooks/spotify_tracks.p', 'rb'))
     if mp3_filename is None or user_mp3tovecs_filename is None:
         user_input = input('Search keywords: ')
+        input_tracks = []
         while True:
+            if user_input == '':
+                break
             ids = sorted([track for track in mp3tovecs if all(word in tracks[track].lower() for word in user_input.lower().split())], key = lambda x: tracks[x])
             for i, id in enumerate(ids):
                 print(f'{i+1}. {tracks[id]}')
             while True:
-                user_input = input('Input track number, 0 to finish, or search keywords: ')
-                if user_input == '0':
+                user_input = input('Input track number, ENTER to finish, or search keywords: ')
+                if user_input == '':
                     break
                 if user_input.isdigit() and len(ids) > 0:
                     if int(user_input)-1 >= len(ids):
                         continue
                     id = ids[int(user_input)-1]
-                    playlist = make_playlist([mp3tovecs, tracktovecs], [creativity, 1-creativity], [id], size=size, lookback=lookback, noise=noise)
-                    spotify_playlist(sp, username, playlist_id, playlist)
-                    webbrowser.open('file://' + os.path.realpath('playlist.html'))
+                    input_tracks.append(id)
+                    print(f'Added {tracks[id]} to playlist')
                 else:
                     break
-            if user_input == '0':
-                break
+        print()
+        if len(input_tracks) == 0:
+            ids = [track for track in mp3tovecs]
+            input_tracks.append(ids[random.randint(0, len(ids))])
+        if len(input_tracks) > 1:
+            playlist = join_the_dots([mp3tovecs, tracktovecs], [creativity, 1-creativity], input_tracks, n=size, noise=noise)
+        else:
+            playlist = make_playlist([mp3tovecs, tracktovecs], [creativity, 1-creativity], input_tracks, size=size, lookback=lookback, noise=noise)
+        spotify_playlist(sp, username, playlist_id, playlist)
+        webbrowser.open('file://' + os.path.realpath('playlist.html'))
     else:
         user_mp3tovecs = pickle.load(open(user_mp3tovecs_filename, 'rb'))
         ids = most_similar_by_vec(mp3tovecs, [user_mp3tovecs[mp3_filename]], topn=10)
@@ -156,6 +190,7 @@ if __name__ == '__main__':
             print(f'{i+1}. {tracks[id[0]]} [{id[1]:.2f}]')
         user_input = input('Input track number: ')
         if user_input.isdigit() and int(user_input) > 0 and int(user_input) < len(ids):
+            print()
             playlist = make_playlist([mp3tovecs, tracktovecs], [creativity, 1-creativity], [ids[int(user_input)-1][0]], size=size, lookback=lookback, noise=noise)
             spotify_playlist(sp, username, playlist_id, playlist)
             webbrowser.open('file://' + os.path.realpath('playlist.html'))

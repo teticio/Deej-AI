@@ -104,12 +104,14 @@ if __name__ == '__main__':
     else:
         user_input = input('Search keywords: ')
         while True:
+            if user_input == '':
+                break
             tracks = sorted([mp3 for mp3 in mp3tovec if all(word in mp3.lower() for word in user_input.lower().split())])
             for i, track in enumerate(tracks):
                 print(f'{i+1}. {track}')
             while True:
-                user_input = input('Input track number to add, 0 to finish, or search keywords: ')
-                if user_input == '0':
+                user_input = input('Input track number to add, ENTER to finish, or search keywords: ')
+                if user_input == '':
                     break
                 if user_input.isdigit() and len(tracks) > 0:
                     if int(user_input)-1 >= len(tracks):
@@ -118,8 +120,6 @@ if __name__ == '__main__':
                     print(f'Added {tracks[int(user_input)-1]} to playlist')
                 else:
                     break
-            if user_input == '0':
-                break
         print()
     total_duration = 0
     if len(input_tracks) == 0:
@@ -134,7 +134,7 @@ if __name__ == '__main__':
         tracks.append('-i')
         tracks.append(track)
         total_duration += get_track_duration(track)
-        if n == 0 and i == 0 or n != 0 and i % n == 0:
+        if n == 0 and i == 0 or n != 0 and i % (n+1) == 0:
             print(f'{i+1}.* {track}')
         else:
             print(f'{i+1}. {track}')
