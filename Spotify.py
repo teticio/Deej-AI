@@ -1,5 +1,4 @@
 # TODO
-# download embeddings and spotify_tracks.csv (without URL) if not there
 # limit number of tracks from same artist
 # remove exact duplicates (mp3vec proximity 1)
 
@@ -11,19 +10,42 @@ import spotipy
 import spotipy.util as util
 import webbrowser
 import random
+import requests
 
-# Download the model data from here to the same directory 
-# https://drive.google.com/open?id=1geEALPQTRBNUvkpI08B-oN4vsIiDTb5I
-# https://drive.google.com/open?id=1Mg924qqF3iDgVW5w34m6Zaki5fNBdfSy
-# https://drive.google.com/open?id=1Qre4Lkym1n5UTpAveNl5ffxlaAmH1ntS
-
-# You can get credentials from https://developer.spotify.com/dashboard/applications
+# If you want to be able to load your playlists into Spotify
+# you will need to get credentials from https://developer.spotify.com/dashboard/applications
 scope = 'playlist-modify-public'
 client_id='fill this in with your details'
 client_secret='fill this in with your details'
 redirect_uri='fill this in with your details'
 
 epsilon_distance = 0.001
+
+def download_file_from_google_drive(id, destination):
+    if os.path.isfile(destination):
+        return None
+    print(f'Downloading {destination}')
+    URL = "https://docs.google.com/uc?export=download"
+    session = requests.Session()
+    response = session.get(URL, params = { 'id' : id }, stream = True)
+    token = get_confirm_token(response)
+    if token:
+        params = { 'id' : id, 'confirm' : token }
+        response = session.get(URL, params = params, stream = True)
+    save_response_content(response, destination)
+
+def get_confirm_token(response):
+    for key, value in response.cookies.items():
+        if key.startswith('download_warning'):
+            return value
+    return None
+
+def save_response_content(response, destination):
+    CHUNK_SIZE = 32768
+    with open(destination, "wb") as f:
+        for chunk in response.iter_content(CHUNK_SIZE):
+            if chunk: # filter out keep-alive new chunks
+                f.write(chunk)
 
 def spotify_playlist(sp, username, playlist_id, track_details):
     with open("playlist.html", "w") as text_file:
@@ -157,7 +179,9 @@ if __name__ == '__main__':
                         playlist_id = playlist_ids[0]
         if playlist_id is None:
             print(f'Unable to access playlist {playlist_name} for user {username}')
-    # download embeddings and tracks.csv if not exists here
+    download_file_from_google_drive('1Mg924qqF3iDgVW5w34m6Zaki5fNBdfSy', 'spotifytovec.p')
+    download_file_from_google_drive('1geEALPQTRBNUvkpI08B-oN4vsIiDTb5I', 'tracktovec.p')
+    download_file_from_google_drive('1Qre4Lkym1n5UTpAveNl5ffxlaAmH1ntS', 'spotify_tracks.p')
     mp3tovecs = pickle.load(open('spotifytovec.p', 'rb'))
     tracktovecs = pickle.load(open('tracktovec.p', 'rb'))
     tracks = pickle.load(open('spotify_tracks.p', 'rb'))
