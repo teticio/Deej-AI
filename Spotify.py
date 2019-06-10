@@ -102,7 +102,7 @@ def most_similar_by_vec(mp3tovecs, weights, positives=None, negatives=None, topn
     return sorted(similar, key=lambda x:-np.dot(x[1], weights))[:topn]
 
 def join_the_dots(mp3tovecs, weights, ids, n=5, noise=0): # create a musical journey between given track "waypoints"
-    max_tries = 10
+    max_tries = 100
     playlist = []
     end = start = ids[0]
     start_vec = [mp3tovec[start] for k, mp3tovec in enumerate(mp3tovecs)]
@@ -125,7 +125,7 @@ def join_the_dots(mp3tovecs, weights, ids, n=5, noise=0): # create a musical jou
     return playlist
 
 def make_playlist(mp3tovecs, weights, seed_tracks, size=10, lookback=3, noise=0):
-    max_tries = 10
+    max_tries = 100
     playlist = seed_tracks
     for i in range(0, len(seed_tracks)):
         print(f'{i+1}.* {tracks[seed_tracks[i]]}')
