@@ -244,7 +244,11 @@ def get_mp3tovec(content_string, filename):
         if random.uniform(0, 1) > dropout:
             continue
         pickle_filename = (vec[:-3]).replace('\\', '_').replace('/', '_').replace(':','_') + 'p'
-        unpickled = pickle.load(open(dump_directory + '/' + pickle_filename, 'rb'))
+        try:
+            unpickled = pickle.load(open(dump_directory + '/' + pickle_filename, 'rb'))
+        except:
+            pickle_filename = pickle_filename.encode('ISO8859-1', 'replace').decode('ascii', 'surrogateescape')
+            unpickled = pickle.load(open(dump_directory + '/' + pickle_filename, 'rb'))
         mp3s[unpickled[0]] = unpickled[1]
     new_idfs = []
     for vec_i in new_vecs:
