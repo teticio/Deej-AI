@@ -16,9 +16,9 @@ import webbrowser
 # you will need to get credentials from https://developer.spotify.com/dashboard/applications
 
 scope = 'playlist-modify-public'
-client_id='194086cb37be48ebb45b9ba4ce4c5936'
-client_secret='fb9fb4957a9841fcb5b2dbc7804e1e85'
-redirect_uri='https://www.attentioncoach.es/'
+client_id='fill this in with your details'
+client_secret='fill this in with your details'
+redirect_uri='fill this in with your details'
 
 epsilon_distance = 0.001
 
