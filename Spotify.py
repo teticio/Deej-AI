@@ -8,16 +8,17 @@ import pickle
 import argparse
 import spotipy
 import spotipy.util as util
-import webbrowser
 import random
 import requests
+import webbrowser
 
 # If you want to be able to load your playlists into Spotify
 # you will need to get credentials from https://developer.spotify.com/dashboard/applications
+
 scope = 'playlist-modify-public'
-client_id='fill this in with your details'
-client_secret='fill this in with your details'
-redirect_uri='fill this in with your details'
+client_id='194086cb37be48ebb45b9ba4ce4c5936'
+client_secret='fb9fb4957a9841fcb5b2dbc7804e1e85'
+redirect_uri='https://www.attentioncoach.es/'
 
 epsilon_distance = 0.001
 
@@ -47,21 +48,21 @@ def save_response_content(response, destination):
             if chunk: # filter out keep-alive new chunks
                 f.write(chunk)
 
-def spotify_playlist(sp, username, playlist_id, track_details):
-    with open("playlist.html", "w") as text_file:
-        track_ids = [track_detail for track_detail in track_details]
-        if sp is None or username is None or playlist_id is None:
-            for track_detail in track_details:
-                text_file.write(f'<iframe src="https://open.spotify.com/embed/track/{track_detail}" width="100%" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>')
-        else:
-            try:
-                result = sp.user_playlist_replace_tracks(username, playlist_id, track_ids)
-            except spotipy.client.SpotifyException:
-                # token has probably gone stale
-                token = util.prompt_for_user_token(username, scope, client_id, client_secret, redirect_uri)
-                sp = spotipy.Spotify(token)
-                result = sp.user_playlist_replace_tracks(username, playlist_id, track_ids)
-            text_file.write(f'<iframe src="https://open.spotify.com/embed/user/{username}/playlist/{playlist_id}" width="100%" height="100%" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>')
+def add_track_to_playlist(sp, username, playlist_id, track_id, replace=False):
+    if sp is not None and username is not None and playlist_id is not None:
+        try:
+            if replace:
+                result = sp.user_playlist_replace_tracks(username, playlist_id, [track_id])
+            else:
+                result = sp.user_playlist_add_tracks(username, playlist_id, [track_id])
+        except spotipy.client.SpotifyException:
+            # token has probably gone stale
+            token = util.prompt_for_user_token(username, scope, client_id, client_secret, redirect_uri)
+            sp = spotipy.Spotify(token)
+            if replace:
+                result = sp.user_playlist_replace_tracks(username, playlist_id, [track_id])
+            else:
+                result = sp.user_playlist_add_tracks(username, playlist_id, [track_id])
 
 def most_similar(mp3tovecs, weights, positive=[], negative=[], topn=5, noise=0):
     if isinstance(positive, str):
@@ -101,7 +102,8 @@ def most_similar_by_vec(mp3tovecs, weights, positives=None, negatives=None, topn
                 / np.linalg.norm(mp3_vec_i) / np.linalg.norm(mp3_vec_j)
     return sorted(similar, key=lambda x:-np.dot(x[1], weights))[:topn]
 
-def join_the_dots(mp3tovecs, weights, ids, n=5, noise=0): # create a musical journey between given track "waypoints"
+# create a musical journey between given track "waypoints"
+def join_the_dots(sp, username, playlist_id, mp3tovecs, weights, ids, n=5, noise=0, replace=True):
     max_tries = 100
     playlist = []
     end = start = ids[0]
@@ -109,6 +111,7 @@ def join_the_dots(mp3tovecs, weights, ids, n=5, noise=0): # create a musical jou
     for end in ids[1:]:
         end_vec = [mp3tovec[end] for k, mp3tovec in enumerate(mp3tovecs)]
         playlist.append(start)
+        add_track_to_playlist(sp, username, playlist_id, playlist[-1], replace and len(playlist) == 1)
         print(f'{len(playlist)}.* {tracks[playlist[-1]]}')
         for i in range(n):
             similar = most_similar_by_vec(mp3tovecs, weights, positives=[[(n-i+1)/n * start_vec[k] + (i+1)/n * end_vec[k]] for k in range(len(mp3tovecs))], topn=max_tries, noise=noise)
@@ -117,17 +120,20 @@ def join_the_dots(mp3tovecs, weights, ids, n=5, noise=0): # create a musical jou
                 if not candidate[0] in playlist and candidate[0] != end:
                     break
             playlist.append(candidate[0])
+            add_track_to_playlist(sp, username, playlist_id, playlist[-1])
             print(f'{len(playlist)}. {tracks[playlist[-1]]}')
         start = end
         start_vec = end_vec
     playlist.append(end)
+    add_track_to_playlist(sp, username, playlist_id, playlist[-1])
     print(f'{len(playlist)}.* {tracks[playlist[-1]]}')
     return playlist
 
-def make_playlist(mp3tovecs, weights, seed_tracks, size=10, lookback=3, noise=0):
+def make_playlist(sp, username, playlist_id, mp3tovecs, weights, seed_tracks, size=10, lookback=3, noise=0, replace=True):
     max_tries = 100
     playlist = seed_tracks
     for i in range(0, len(seed_tracks)):
+        add_track_to_playlist(sp, username, playlist_id, playlist[i], replace and len(playlist) == 1)
         print(f'{i+1}.* {tracks[seed_tracks[i]]}')
     for i in range(len(seed_tracks), size):
         similar = most_similar(mp3tovecs, weights, positive=playlist[-lookback:], topn=max_tries, noise=noise)
@@ -136,6 +142,7 @@ def make_playlist(mp3tovecs, weights, seed_tracks, size=10, lookback=3, noise=0)
             if not candidate[0] in playlist:
                 break
         playlist.append(candidate[0])
+        add_track_to_playlist(sp, username, playlist_id, playlist[-1])
         print(f'{i+1}. {tracks[playlist[-1]]}')
     return playlist
 
@@ -149,6 +156,7 @@ if __name__ == '__main__':
     parser.add_argument('--noise', type=float, help='Degree of randomness (0-1, default 0)')
     parser.add_argument('--mp3', type=str, help='Start with sommething that sounds like this')
     parser.add_argument('--mp3tovec', type=str, help='MP3ToVecs file (full path)')
+    parser.add_argument('--extend', action='store_true', help='Extend existing playlist')
     args = parser.parse_args()
     username = args.user
     playlist_name = args.playlist
@@ -166,6 +174,10 @@ if __name__ == '__main__':
         lookback = 3
     if noise is None:
         noise = 0
+    if args.extend:
+        replace = False
+    else:
+        replace = True
     sp = playlist_id = None
     if username is not None and playlist_name is not None:
         token = util.prompt_for_user_token(username, scope, client_id, client_secret, redirect_uri)
@@ -211,11 +223,9 @@ if __name__ == '__main__':
             ids = [track for track in mp3tovecs]
             input_tracks.append(ids[random.randint(0, len(ids))])
         if len(input_tracks) > 1:
-            playlist = join_the_dots([mp3tovecs, tracktovecs], [creativity, 1-creativity], input_tracks, n=size, noise=noise)
+            playlist = join_the_dots(sp, username, playlist_id, [mp3tovecs, tracktovecs], [creativity, 1-creativity], input_tracks, n=size, noise=noise, replace=replace)
         else:
-            playlist = make_playlist([mp3tovecs, tracktovecs], [creativity, 1-creativity], input_tracks, size=size, lookback=lookback, noise=noise)
-        spotify_playlist(sp, username, playlist_id, playlist)
-        webbrowser.open('file://' + os.path.realpath('playlist.html'))
+            playlist = make_playlist(sp, username, playlist_id, [mp3tovecs, tracktovecs], [creativity, 1-creativity], input_tracks, size=size, lookback=lookback, noise=noise, replace=replace)
     else:
         user_mp3tovecs = pickle.load(open(user_mp3tovecs_filename, 'rb'))
         ids = most_similar_by_vec(mp3tovecs, [user_mp3tovecs[mp3_filename]], topn=10)
@@ -224,6 +234,9 @@ if __name__ == '__main__':
         user_input = input('Input track number: ')
         if user_input.isdigit() and int(user_input) > 0 and int(user_input) < len(ids):
             print()
-            playlist = make_playlist([mp3tovecs, tracktovecs], [creativity, 1-creativity], [ids[int(user_input)-1][0]], size=size, lookback=lookback, noise=noise)
-            spotify_playlist(sp, username, playlist_id, playlist)
-            webbrowser.open('file://' + os.path.realpath('playlist.html'))
+            playlist = make_playlist(sp, username, playlist_id, [mp3tovecs, tracktovecs], [creativity, 1-creativity], [ids[int(user_input)-1][0]], size=size, lookback=lookback, noise=noise, replace=replace)
+    if sp is None or username is None or playlist_id is None:
+        with open("playlist.html", "w") as text_file:
+            for id in playlist:
+                text_file.write(f'<iframe src="https://open.spotify.com/embed/track/{id}" width="100%" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>')
+        webbrowser.open('file://' + os.path.realpath('playlist.html'))
