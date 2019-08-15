@@ -64,26 +64,27 @@ def add_track_to_playlist(sp, username, playlist_id, track_id, replace=False):
             else:
                 result = sp.user_playlist_add_tracks(username, playlist_id, [track_id])
 
-def most_similar(mp3tovecs, weights, positive=[], negative=[], topn=5, noise=0):
+def most_similar(mp3tovecs, weights, positive=[], negative=[], noise=0):
     if isinstance(positive, str):
         positive = [positive] # broadcast to list
     if isinstance(negative, str):
         negative = [negative] # broadcast to list
-    similar = [[track, [0] * len(weights)] for track in mp3tovecs[0]]
+    similar = np.zeros((len(mp3tovecs[0]), 2, len(weights)), dtype=np.float64)
     for k, mp3tovec in enumerate(mp3tovecs):
         mp3_vec_i = np.sum([mp3tovec[i] for i in positive] +
                            [-mp3tovec[i] for i in negative], axis=0)
         mp3_vec_i += np.random.normal(0, noise, len(mp3_vec_i))
+        mp3_vec_i = mp3_vec_i / np.linalg.norm(mp3_vec_i)
         for j, track_j in enumerate(mp3tovec):
             if track_j in positive or track_j in negative:
                 continue
             mp3_vec_j = mp3tovec[track_j]
-            similar[j][1][k] = np.dot(mp3_vec_i, mp3_vec_j) \
-                / np.linalg.norm(mp3_vec_i) / np.linalg.norm(mp3_vec_j)
-    return sorted(similar, key=lambda x:-np.dot(x[1], weights))[:topn]
+            similar[j, 0, k] = j
+            similar[j, 1, k] = np.dot(mp3_vec_i, mp3_vec_j)
+    return sorted(similar, key=lambda x:-np.dot(x[1], weights))    
 
-def most_similar_by_vec(mp3tovecs, weights, positives=None, negatives=None, topn=5, noise=0):
-    similar = [[track, [0] * len(weights)] for track in mp3tovecs[0]]
+def most_similar_by_vec(mp3tovecs, weights, positives=None, negatives=None, noise=0):
+    similar = np.zeros((len(mp3tovecs[0]), 2, len(weights)), dtype=np.float64)
     positive = negative = []
     for k, mp3tovec in enumerate(mp3tovecs):
         if positives is not None:
@@ -96,16 +97,18 @@ def most_similar_by_vec(mp3tovecs, weights, positives=None, negatives=None, topn
             negative = [negative] # broadcast to list
         mp3_vec_i = np.sum([i for i in positive] + [-i for i in negative], axis=0)
         mp3_vec_i += np.random.normal(0, noise, len(mp3_vec_i))
+        mp3_vec_i = mp3_vec_i / np.linalg.norm(mp3_vec_i)
         for j, track_j in enumerate(mp3tovec):
             mp3_vec_j = mp3tovec[track_j]
-            similar[j][1][k] = np.dot(mp3_vec_i, mp3_vec_j) \
-                / np.linalg.norm(mp3_vec_i) / np.linalg.norm(mp3_vec_j)
-    return sorted(similar, key=lambda x:-np.dot(x[1], weights))[:topn]
+            similar[j, 0, k] = j
+            similar[j, 1, k] = np.dot(mp3_vec_i, mp3_vec_j)
+    return sorted(similar, key=lambda x:-np.dot(x[1], weights))
 
 # create a musical journey between given track "waypoints"
-def join_the_dots(sp, username, playlist_id, mp3tovecs, weights, ids, n=5, noise=0, replace=True):
-    max_tries = 100
+def join_the_dots(sp, username, playlist_id, mp3tovecs, weights, ids, \
+                  tracks, track_ids, n=5, noise=0, replace=True):
     playlist = []
+    playlist_tracks = [tracks[_] for _ in ids]
     end = start = ids[0]
     start_vec = [mp3tovec[start] for k, mp3tovec in enumerate(mp3tovecs)]
     for end in ids[1:]:
@@ -114,12 +117,17 @@ def join_the_dots(sp, username, playlist_id, mp3tovecs, weights, ids, n=5, noise
         add_track_to_playlist(sp, username, playlist_id, playlist[-1], replace and len(playlist) == 1)
         print(f'{len(playlist)}.* {tracks[playlist[-1]]}')
         for i in range(n):
-            similar = most_similar_by_vec(mp3tovecs, weights, positives=[[(n-i+1)/n * start_vec[k] + (i+1)/n * end_vec[k]] for k in range(len(mp3tovecs))], topn=max_tries, noise=noise)
-            candidates = [candidate for candidate in similar if candidate[0] != playlist[-1]]
+            candidates = most_similar_by_vec(mp3tovecs, weights,
+                                             [[(n-i+1)/n * start_vec[k] +
+                                               (i+1)/n * end_vec[k]]
+                                              for k in range(len(mp3tovecs))],
+                                             noise=noise)
             for candidate in candidates:
-                if not candidate[0] in playlist and candidate[0] != end:
+                track_id = track_ids[int(candidate[0][0])]
+                if track_id not in playlist + ids and tracks[track_id] not in playlist_tracks:
                     break
-            playlist.append(candidate[0])
+            playlist.append(track_id)
+            playlist_tracks.append(tracks[track_id])
             add_track_to_playlist(sp, username, playlist_id, playlist[-1])
             print(f'{len(playlist)}. {tracks[playlist[-1]]}')
         start = end
@@ -129,19 +137,21 @@ def join_the_dots(sp, username, playlist_id, mp3tovecs, weights, ids, n=5, noise
     print(f'{len(playlist)}.* {tracks[playlist[-1]]}')
     return playlist
 
-def make_playlist(sp, username, playlist_id, mp3tovecs, weights, seed_tracks, size=10, lookback=3, noise=0, replace=True):
-    max_tries = 100
+def make_playlist(sp, username, playlist_id, mp3tovecs, weights, seed_tracks, \
+                  tracks, track_ids, size=10, lookback=3, noise=0, replace=True):
     playlist = seed_tracks
+    playlist_tracks = [tracks[_] for _ in playlist]
     for i in range(0, len(seed_tracks)):
         add_track_to_playlist(sp, username, playlist_id, playlist[i], replace and len(playlist) == 1)
         print(f'{i+1}.* {tracks[seed_tracks[i]]}')
     for i in range(len(seed_tracks), size):
-        similar = most_similar(mp3tovecs, weights, positive=playlist[-lookback:], topn=max_tries, noise=noise)
-        candidates = [candidate for candidate in similar if candidate[0] != playlist[-1]]
+        candidates = most_similar(mp3tovecs, weights, positive=playlist[-lookback:], noise=noise)
         for candidate in candidates:
-            if not candidate[0] in playlist:
+            track_id = track_ids[int(candidate[0][0])]
+            if track_id not in playlist and tracks[track_id] not in playlist_tracks:
                 break
-        playlist.append(candidate[0])
+        playlist.append(track_id)
+        playlist_tracks.append(tracks[track_id])
         add_track_to_playlist(sp, username, playlist_id, playlist[-1])
         print(f'{i+1}. {tracks[playlist[-1]]}')
     return playlist
@@ -195,8 +205,11 @@ if __name__ == '__main__':
     download_file_from_google_drive('1geEALPQTRBNUvkpI08B-oN4vsIiDTb5I', 'tracktovec.p')
     download_file_from_google_drive('1Qre4Lkym1n5UTpAveNl5ffxlaAmH1ntS', 'spotify_tracks.p')
     mp3tovecs = pickle.load(open('spotifytovec.p', 'rb'))
+    mp3tovecs = dict(zip(mp3tovecs.keys(), [mp3tovecs[_] / np.linalg.norm(mp3tovecs[_]) for _ in mp3tovecs]))
     tracktovecs = pickle.load(open('tracktovec.p', 'rb'))
+    tracktovecs = dict(zip(tracktovecs.keys(), [tracktovecs[_] / np.linalg.norm(tracktovecs[_]) for _ in tracktovecs]))
     tracks = pickle.load(open('spotify_tracks.p', 'rb'))
+    track_ids = [_ for _ in mp3tovecs]
     if mp3_filename is None or user_mp3tovecs_filename is None:
         user_input = input('Search keywords: ')
         input_tracks = []
@@ -223,9 +236,9 @@ if __name__ == '__main__':
             ids = [track for track in mp3tovecs]
             input_tracks.append(ids[random.randint(0, len(ids))])
         if len(input_tracks) > 1:
-            playlist = join_the_dots(sp, username, playlist_id, [mp3tovecs, tracktovecs], [creativity, 1-creativity], input_tracks, n=size, noise=noise, replace=replace)
+            playlist = join_the_dots(sp, username, playlist_id, [mp3tovecs, tracktovecs], [creativity, 1-creativity], input_tracks, tracks, track_ids, n=size, noise=noise, replace=replace)
         else:
-            playlist = make_playlist(sp, username, playlist_id, [mp3tovecs, tracktovecs], [creativity, 1-creativity], input_tracks, size=size, lookback=lookback, noise=noise, replace=replace)
+            playlist = make_playlist(sp, username, playlist_id, [mp3tovecs, tracktovecs], [creativity, 1-creativity], input_tracks, tracks, track_ids, size=size, lookback=lookback, noise=noise, replace=replace)
     else:
         user_mp3tovecs = pickle.load(open(user_mp3tovecs_filename, 'rb'))
         ids = most_similar_by_vec(mp3tovecs, [user_mp3tovecs[mp3_filename]], topn=10)
