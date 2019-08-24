@@ -239,14 +239,17 @@ if __name__ == '__main__':
         if token is not None:
             sp = spotipy.Spotify(token)
             if sp is not None:
-                playlists = sp.user_playlists(username)
-                if playlists is not None:
-                    playlist_ids = [
-                        playlist['id'] for playlist in playlists['items']
-                        if playlist['name'] == playlist_name
-                    ]
-                    if len(playlist_ids) > 0:
-                        playlist_id = playlist_ids[0]
+                try:
+                    playlists = sp.user_playlists(username)
+                    if playlists is not None:
+                        playlist_ids = [
+                            playlist['id'] for playlist in playlists['items']
+                            if playlist['name'] == playlist_name
+                        ]
+                        if len(playlist_ids) > 0:
+                            playlist_id = playlist_ids[0]
+                except:
+                    pass
         if playlist_id is None:
             print(
                 f'Unable to access playlist {playlist_name} for user {username}'
