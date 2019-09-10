@@ -4,6 +4,8 @@
 
 [Robert Dargavel Smith](mailto:teticio@gmail.com) - Advanced Machine Learning end of Masters project ([MBIT School](http://mbitschool.academy), Madrid, Spain)
 
+**UPDATE**: Check out the results after applying to 320,000 tracks on Spotify [here](https://deej-ai.online).
+
 ### Motivation
 
 There are a number of automatic DJ tools around, which cleverly match the tempo of one song with another and mix the beats. To be honest, I have always found that kind of DJ rather boring: the better they are technically, the more it sounds just like one interminable song. In my book, it's not about how you play, but <i>what</i> you play. I have collected many rare records over the years and done a bit of deejaying on the radio and in clubs. I can almost instantly tell whether I am going to like a song or not just by listening to it for a few seconds. Or, if a song is playing, one that would go well with it usually comes to mind immediately. I thought that artificial intelligence could be applied to this "music intuition" as a music recommendation system based on simply *listening* to a song (and, of course, having an encyclopaedic knowledge of music).
