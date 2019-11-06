@@ -47,16 +47,16 @@ if __name__ == '__main__':
         slice_size = model.layers[0].input_shape[2]
         slice_time = slice_size * hop_length / sr
         files = []
+        done = os.listdir(dump_directory)
         for filename, full_path in walkmp3s(mp3_directory):
             pickle_filename = (full_path[:-3]).replace('\\', '_').replace('/', '_').replace(':','_') + 'p'
-            if pickle_filename in os.listdir(dump_directory):
+            if pickle_filename in done:
                 continue
-            files.append((filename, full_path))
+            files.append((pickle_filename, full_path))
         random.shuffle(files)
         try:
             with tqdm(files, unit="file") as t:
-                for filename, full_path in t:
-                    pickle_filename = (full_path[:-3]).replace('\\', '_').replace('/', '_').replace(':','_') + 'p'
+                for pickle_filename, full_path in t:
                     try:
                         y, sr = librosa.load(full_path, mono=True)
                         if y.shape[0] < slice_size:
