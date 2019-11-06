@@ -52,7 +52,7 @@ if __name__ == '__main__':
             if pickle_filename in os.listdir(dump_directory):
                 continue
             files.append((filename, full_path))
-        files = random.shuffle(files)
+        random.shuffle(files)
         try:
             with tqdm(files, unit="file") as t:
                 for filename, full_path in t:
