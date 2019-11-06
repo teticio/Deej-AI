@@ -6,6 +6,7 @@ import librosa
 import pickle
 from tqdm import tqdm
 import argparse
+import random
 
 def walkmp3s(folder):
     for dirpath, dirs, files in os.walk(folder, topdown=False):
@@ -45,31 +46,35 @@ if __name__ == '__main__':
         n_mels     = model.layers[0].input_shape[1]
         slice_size = model.layers[0].input_shape[2]
         slice_time = slice_size * hop_length / sr
-        num_files = 0
+        files = []
         for filename, full_path in walkmp3s(mp3_directory):
-            num_files += 1
+            pickle_filename = (full_path[:-3]).replace('\\', '_').replace('/', '_').replace(':','_') + 'p'
+            if pickle_filename in os.listdir(dump_directory):
+                continue
+            files.append((filename, full_path))
+        files = random.shuffle(files)
         try:
-            with tqdm(walkmp3s(mp3_directory), total=num_files, unit="file") as t:
+            with tqdm(files, unit="file") as t:
                 for filename, full_path in t:
                     pickle_filename = (full_path[:-3]).replace('\\', '_').replace('/', '_').replace(':','_') + 'p'
-                    if pickle_filename in os.listdir(dump_directory):
-                        continue
                     try:
                         y, sr = librosa.load(full_path, mono=True)
+                        if y.shape[0] < slice_size:
+                            print(f'Skipping {full_path}')
+                            continue
+                        S = librosa.feature.melspectrogram(y=y, sr=sr, n_fft=n_fft, hop_length=hop_length, n_mels=n_mels, fmax=sr/2)
+                        x = np.ndarray(shape=(S.shape[1] // slice_size, n_mels, slice_size, 1), dtype=float)
+                        for slice in range(S.shape[1] // slice_size):
+                            log_S = librosa.power_to_db(S[:, slice * slice_size : (slice+1) * slice_size], ref=np.max)
+                            if np.max(log_S) - np.min(log_S) != 0:
+                                log_S = (log_S - np.min(log_S)) / (np.max(log_S) - np.min(log_S))
+                            x[slice, :, :, 0] = log_S
+                        pickle.dump((full_path, model.predict(x)), open(dump_directory + '/' + pickle_filename, 'wb'))
+                    except KeyboardInterrupt:
+                        raise
                     except:
                         print(f'Skipping {full_path}')
                         continue
-                    if y.shape[0] < slice_size:
-                        print(f'Skipping {full_path}')
-                        continue
-                    S = librosa.feature.melspectrogram(y=y, sr=sr, n_fft=n_fft, hop_length=hop_length, n_mels=n_mels, fmax=sr/2)
-                    x = np.ndarray(shape=(S.shape[1] // slice_size, n_mels, slice_size, 1), dtype=float)
-                    for slice in range(S.shape[1] // slice_size):
-                        log_S = librosa.power_to_db(S[:, slice * slice_size : (slice+1) * slice_size], ref=np.max)
-                        if np.max(log_S) - np.min(log_S) != 0:
-                            log_S = (log_S - np.min(log_S)) / (np.max(log_S) - np.min(log_S))
-                        x[slice, :, :, 0] = log_S
-                    pickle.dump((full_path, model.predict(x)), open(dump_directory + '/' + pickle_filename, 'wb'))
         except KeyboardInterrupt:
             t.close() # stop the progress bar from sprawling all over the place after a keyboard interrupt
             raise

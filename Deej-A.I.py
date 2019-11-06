@@ -271,7 +271,7 @@ def get_mp3tovec(content_string, filename):
     return similar[0][0]
     
 def get_track_info(filename):
-    artwork = None
+    artwork = pict = None
     artist = track = album = None
     duration = 0
     if filename[-3:].lower() == 'mp3':
@@ -279,6 +279,9 @@ def get_track_info(filename):
             audio = ID3(filename)
             if audio.get('APIC:') is not None:
                 pict = audio.get('APIC:').data
+            if audio.get('APIC:Cover') is not None:
+                pict = audio.get('APIC:Cover').data
+            if pict is not None:
                 im = Image.open(BytesIO(pict)).convert('RGB')
                 buff = BytesIO()
                 im.save(buff, format='jpeg')
