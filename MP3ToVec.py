@@ -79,15 +79,21 @@ if __name__ == '__main__':
             t.close() # stop the progress bar from sprawling all over the place after a keyboard interrupt
             raise
         t.close()
+    mp3tovecs_fullpath = dump_directory + f'/mp3tovecs/{mp3tovec_file}.p'
+    if os.path.isfile(mp3tovecs_fullpath):
+        mp3tovecs = pickle.load(open(mp3tovecs_fullpath, 'rb'))
+    else:
+        mp3tovecs = {}
     unpickled = {}
     for filename in os.listdir(dump_directory):
         if not os.path.isfile(dump_directory + '/' + filename):
             continue
         p = pickle.load(open(dump_directory + '/' + filename, 'rb'))
+        if p[0] in mp3tovecs:
+            continue
         unpickled[p[0]] = p[1]
     total_num_mp3s = len(unpickled)
     start_batch = 1
-    mp3tovecs = {}
     for filename in os.listdir(dump_directory + '/mp3tovecs'):
         if filename[:len(mp3tovec_file)] == mp3tovec_file and filename[len(mp3tovec_file)+1:-2].isdigit():
             mp3tovec = pickle.load(open(dump_directory + '/mp3tovecs/' + filename, 'rb'))
@@ -172,7 +178,7 @@ if __name__ == '__main__':
         # free up memory
         del cos_distances
         cos_distances = None        
-    pickle.dump(mp3tovecs, open(dump_directory + f'/mp3tovecs/{mp3tovec_file}.p', 'wb'))
+    pickle.dump(mp3tovecs, open(mp3tovecs_fullpath, 'wb'))
     for filename in os.listdir(dump_directory + '/mp3tovecs'):
         if filename[:len(mp3tovec_file)] == mp3tovec_file and filename[len(mp3tovec_file)+1:-2].isdigit():
             os.remove(dump_directory + '/mp3tovecs/' + filename)
