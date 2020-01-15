@@ -88,8 +88,12 @@ if __name__ == '__main__':
     for filename in os.listdir(dump_directory):
         if not os.path.isfile(dump_directory + '/' + filename):
             continue
-        p = pickle.load(open(dump_directory + '/' + filename, 'rb'))
-        if p[0] in mp3tovecs:
+        try:
+            p = pickle.load(open(dump_directory + '/' + filename, 'rb'))
+            if p[0] in mp3tovecs:
+                continue
+        except:
+            print(f'Skipping pickle {filename}')
             continue
         unpickled[p[0]] = p[1]
     total_num_mp3s = len(unpickled)
