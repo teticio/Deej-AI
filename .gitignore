@@ -1,4 +1,8 @@
 lib/
-lib64/
+lib64
 bin/
 include/
+data/
+etc/
+share/
+Pickles/

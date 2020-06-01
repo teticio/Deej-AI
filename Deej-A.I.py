@@ -15,7 +15,7 @@ from PIL import Image
 import base64
 import numpy as np
 import pandas as pd
-import keras
+#import keras
 from keras.models import load_model
 from keras import backend as K
 import librosa
@@ -40,7 +40,7 @@ def static_file(path):
 theme = {
     'dark': True,
     'detail': '#007439',
-    'primary': '#00EA64', 
+    'primary': '#00EA64',
     'secondary': '#6E6E6E'
 }
 
@@ -166,7 +166,7 @@ app.layout = html.Div(
                 ),
                 noise_knob
             ]
-        )        
+        )
     ]
 )
 
@@ -271,7 +271,7 @@ def get_mp3tovec(content_string, filename):
     similar = most_similar_by_vec([vec], topn=1, noise=0)
     print(f'TF-IDF analysis took {time.time() - start:0.0f}s')
     return similar[0][0]
-    
+
 def get_track_info(filename):
     artwork = pict = None
     artist = track = album = None
@@ -441,4 +441,4 @@ if __name__ == '__main__':
         epsilon_distance = 0.001 # should be small, but not too small
     mp3tovec = pickle.load(open(dump_directory + '/mp3tovecs/' + mp3tovec_file + '.p', 'rb'))
     print(f'{len(mp3tovec)} MP3s')
-    app.run_server(debug=False)
+    app.run_server(threaded=False, debug=False)
