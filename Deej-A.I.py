@@ -420,14 +420,14 @@ def update_output(contents, jsonified_data, filename, lookback, noise):
     return [upload, shared]
 
 
-def track2m3u(fileout, tracks, working_directory):
+def tracks_to_m3u(fileout, tracks):
     """
-    using relative path for better interoperability
+    using absolute path
     """
-    relative_path_index = len(working_directory) + 1
+
     with open(fileout, 'w') as f:
         for item in tracks:
-            f.write(item[relative_path_index:] + "\n")
+            f.write(item + "\n")
 
 
 if __name__ == '__main__':
@@ -472,9 +472,7 @@ if __name__ == '__main__':
             print("Outfile playlist: {}".format(playlist_outfile))
             print("Input song selected: {}".format(input_song))
             print("Requested {} songs".format(n_songs))
-            working_directory = os.path.dirname(os.path.realpath(__file__))
-            #print(working_directory)
-            song = ["{}/{}".format(working_directory, input_song)]
+
             if n_songs == None:
                 n_songs = default_playlist_size
             if noise == None:
@@ -482,7 +480,7 @@ if __name__ == '__main__':
             if lookback == None:
                 lookback = default_lookback
 
-            tracks = make_playlist(song, size=n_songs + 1, noise=noise, lookback=lookback)
-            track2m3u(playlist_outfile, tracks, working_directory)
+            tracks = make_playlist([input_song], size=n_songs + 1, noise=noise, lookback=lookback)
+            tracks_to_m3u(playlist_outfile, tracks)
         else:
             print("[ERR] Argument --inputsong is required")
