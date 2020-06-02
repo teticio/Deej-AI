@@ -70,3 +70,24 @@ python Join_the_dots.py Pickles\mp3tovecs\mp3tovec.p --input tracks.txt mix.mp3 
 where "tracks.txt" is a text file containing a list of MP3 or M4A files and, here, 9 is the number of additional tracks you want to generate between each of these.
 
 If you are interested in the data I used to train the neural network, feel free to drop me an [email](mailto:teticio@gmail.com).
+
+
+### Generate .m3u playlist file
+
+Optionally you can generate an ```.m3u``` file with relative path to export the playlist and play it on another device.
+
+The playlist file uses absolute paths.
+
+Run with:
+
+```bash
+python Deej-A.I.py Pickles mp3tovec --playlist playlist_outfile.m3u --inputsong startingsong.mp3
+```
+
+It additionally takes optional parameters:
+
+```bash
+--nsongs  # Number of songs in the playlist
+--noise   # Amount of noise in the playlist (default 0)
+--lookback # Amount of lookback in the playlist (default 3)
+```

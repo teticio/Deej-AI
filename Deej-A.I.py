@@ -15,7 +15,7 @@ from PIL import Image
 import base64
 import numpy as np
 import pandas as pd
-import keras
+#import keras
 from keras.models import load_model
 from keras import backend as K
 import librosa
@@ -27,6 +27,7 @@ import argparse
 
 default_lookback = 3 # number of previous tracks to take into account
 default_noise = 0    # amount of randomness to throw in the mix
+default_playlist_size = 10
 
 app = dash.Dash()
 app.css.config.serve_locally = True
@@ -40,7 +41,7 @@ def static_file(path):
 theme = {
     'dark': True,
     'detail': '#007439',
-    'primary': '#00EA64', 
+    'primary': '#00EA64',
     'secondary': '#6E6E6E'
 }
 
@@ -166,7 +167,7 @@ app.layout = html.Div(
                 ),
                 noise_knob
             ]
-        )        
+        )
     ]
 )
 
@@ -271,7 +272,7 @@ def get_mp3tovec(content_string, filename):
     similar = most_similar_by_vec([vec], topn=1, noise=0)
     print(f'TF-IDF analysis took {time.time() - start:0.0f}s')
     return similar[0][0]
-    
+
 def get_track_info(filename):
     artwork = pict = None
     artist = track = album = None
@@ -418,6 +419,17 @@ def update_output(contents, jsonified_data, filename, lookback, noise):
     time.sleep(1)
     return [upload, shared]
 
+
+def tracks_to_m3u(fileout, tracks):
+    """
+    using absolute path
+    """
+
+    with open(fileout, 'w') as f:
+        for item in tracks:
+            f.write(item + "\n")
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('pickles', type=str, help='Directory of pickled TrackToVecs')
@@ -426,6 +438,12 @@ if __name__ == '__main__':
     parser.add_argument('--model', type=str, help='Load spectrogram to Track2Vec model (default: "speccy_model")')
     parser.add_argument('--batchsize', type=int, help='Number of MP3s to process in each batch (default: 100)')
     parser.add_argument('--epsilon', type=float, help='Epsilon distance (default: 0.001)')
+    parser.add_argument('--playlist', type=str, help='Write playlist file without starting interface')
+    parser.add_argument('--inputsong', type=str, help="Requires --playlist option\nSelects a song to start the playlist with.")
+    parser.add_argument("--nsongs", type=int, help="Requires --playlist option\nNumber of songs in the playlist")
+    parser.add_argument("--noise", type=int, help="Requires --playlist option\nAmount of noise in the playlist (default 0)")
+    parser.add_argument("--lookback", type=int, help="Requires --playlist option\nAmount of lookback in the playlist (default 3)")
+
     args = parser.parse_args()
     dump_directory = args.pickles
     mp3tovec_file = args.mp3tovec
@@ -433,6 +451,12 @@ if __name__ == '__main__':
     model_file = args.model
     batch_size = args.batchsize
     epsilon_distance = args.epsilon
+    playlist_outfile = args.playlist
+    input_song = args.inputsong
+    n_songs = args.nsongs
+    noise = args.noise
+    lookback = args.lookback
+
     if model_file == None:
         model_file = 'speccy_model'
     if batch_size == None:
@@ -441,4 +465,22 @@ if __name__ == '__main__':
         epsilon_distance = 0.001 # should be small, but not too small
     mp3tovec = pickle.load(open(dump_directory + '/mp3tovecs/' + mp3tovec_file + '.p', 'rb'))
     print(f'{len(mp3tovec)} MP3s')
-    app.run_server(debug=False)
+    if playlist_outfile == None:
+        app.run_server(threaded=False, debug=False)
+    else:
+        if input_song != None:
+            print("Outfile playlist: {}".format(playlist_outfile))
+            print("Input song selected: {}".format(input_song))
+            print("Requested {} songs".format(n_songs))
+
+            if n_songs == None:
+                n_songs = default_playlist_size
+            if noise == None:
+                noise = default_noise
+            if lookback == None:
+                lookback = default_lookback
+
+            tracks = make_playlist([input_song], size=n_songs + 1, noise=noise, lookback=lookback)
+            tracks_to_m3u(playlist_outfile, tracks)
+        else:
+            print("[ERR] Argument --inputsong is required")

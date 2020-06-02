@@ -5,9 +5,10 @@ Flask==1.0.2
 spotipy==2.4.4
 librosa==0.6.3
 dash_core_components==0.47.0
-Keras==2.2.4
+Keras==2.3.1
 dash_daq==0.1.4
 pandas==0.24.2
 numpy==1.16.3
 dash_html_components==0.16.0
 Pillow==6.2.0
+tensorflow==2.2.0
