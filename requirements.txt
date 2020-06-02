@@ -10,5 +10,5 @@ dash_daq==0.1.4
 pandas==0.24.2
 numpy==1.16.3
 dash_html_components==0.16.0
-Pillow==6.2.0
+Pillow==6.2.2
 tensorflow==2.2.0
