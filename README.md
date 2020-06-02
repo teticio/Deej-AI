@@ -76,7 +76,7 @@ If you are interested in the data I used to train the neural network, feel free 
 
 Optionally you can generate an ```.m3u``` file with relative path to export the playlist and play it on another device.
 
-The playlist file uses reletive paths to make interoperability easier.
+The playlist file uses absolute paths.
 
 Run with:
 
