@@ -101,7 +101,7 @@ smart-open==2.1.1
 spotipy==2.4.4
 tensorboard==2.2.2
 tensorboard-plugin-wit==1.7.0
-tensorflow==2.2.0
+tensorflow==2.6.4
 tensorflow-estimator==2.2.0
 termcolor==1.1.0
 threadpoolctl==2.1.0
