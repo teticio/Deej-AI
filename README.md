@@ -42,7 +42,7 @@ Another simple idea is to listen to music using a microphone and to propose a se
 
 ### Try it out for yourself
 
-Once you have installed the required python packages with
+Once you have installed the required python (3.8) packages with
 
 ```bash
 pip install -r requirements.txt
