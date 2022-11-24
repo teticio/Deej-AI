@@ -15,7 +15,7 @@ from PIL import Image
 import base64
 import numpy as np
 import pandas as pd
-#import keras
+import tensorflow as tf
 from keras.models import load_model
 from keras import backend as K
 import librosa
@@ -236,7 +236,12 @@ def get_mp3tovec(content_string, filename):
         x[slice, :, :, 0] = log_S
     # need to put semaphore around this
     K.clear_session()
-    model = load_model(model_file)
+    model = load_model(
+        model_file,
+        custom_objects={
+            'cosine_proximity':
+            tf.compat.v1.keras.losses.cosine_proximity
+        })
     new_vecs = model.predict(x)
     K.clear_session()
     print(f'Spectrogram analysis took {time.time() - start:0.0f}s')
@@ -264,11 +269,11 @@ def get_mp3tovec(content_string, filename):
         new_idfs.append(-np.log(idf / (len(mp3s) + 1))) # N + 1
     vec = 0
     for i, vec_i in enumerate(new_vecs):
-        tf = 0
+        tf_ = 0
         for vec_j in new_vecs:
             if 1 - np.dot(vec_i, vec_j) / (np.linalg.norm(vec_i) * np.linalg.norm(vec_j)) < epsilon_distance:
-                tf += 1
-        vec += vec_i * tf * new_idfs[i]
+                tf_ += 1
+        vec += vec_i * tf_ * new_idfs[i]
     similar = most_similar_by_vec([vec], topn=1, noise=0)
     print(f'TF-IDF analysis took {time.time() - start:0.0f}s')
     return similar[0][0]

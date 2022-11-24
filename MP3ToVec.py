@@ -1,4 +1,8 @@
-import keras
+import warnings
+
+warnings.filterwarnings("ignore")
+
+import tensorflow as tf
 from keras.models import load_model
 import os
 import numpy as np
@@ -39,12 +43,17 @@ if __name__ == '__main__':
         os.makedirs(dump_directory + '/mp3tovecs')
     if mp3_directory is not None:
         print(f'Creating Track2Vec matrices')
-        model = load_model(model_file)
+        model = load_model(
+            model_file,
+            custom_objects={
+                'cosine_proximity':
+                tf.compat.v1.keras.losses.cosine_proximity
+            })
         sr         = 22050
         n_fft      = 2048
         hop_length = 512
-        n_mels     = model.layers[0].input_shape[1]
-        slice_size = model.layers[0].input_shape[2]
+        n_mels     = model.layers[0].input_shape[0][1]
+        slice_size = model.layers[0].input_shape[0][2]
         slice_time = slice_size * hop_length / sr
         files = []
         done = os.listdir(dump_directory)
@@ -69,7 +78,7 @@ if __name__ == '__main__':
                             if np.max(log_S) - np.min(log_S) != 0:
                                 log_S = (log_S - np.min(log_S)) / (np.max(log_S) - np.min(log_S))
                             x[slice, :, :, 0] = log_S
-                        pickle.dump((full_path, model.predict(x)), open(dump_directory + '/' + pickle_filename, 'wb'))
+                        pickle.dump((full_path, model.predict(x, verbose=0)), open(dump_directory + '/' + pickle_filename, 'wb'))
                     except KeyboardInterrupt:
                         raise
                     except:
