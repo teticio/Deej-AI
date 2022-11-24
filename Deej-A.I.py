@@ -4,8 +4,8 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import dash
 from dash.dependencies import Input, Output, State
 import dash_daq as daq
-from dash import dcc
-from dash import html
+import dash_core_components as dcc
+import dash_html_components as html
 from flask import send_from_directory
 from io import BytesIO
 from mutagen.mp3 import MP3

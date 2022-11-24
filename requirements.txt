@@ -4,7 +4,9 @@ mutagen
 Flask
 spotipy
 librosa
-dash_daq
+dash_core_components==0.47.0
+dash_html_components==0.16.0
+dash_daq==0.1.4
 pandas
 numpy
 dash_html_components
