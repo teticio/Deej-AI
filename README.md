@@ -4,6 +4,8 @@
 
 [Robert Dargavel Smith](mailto:teticio@gmail.com) - Advanced Machine Learning end of Masters project ([MBIT School](http://mbitschool.academy), Madrid, Spain)
 
+**UPDATE**: You can now use this model even more easily than before in the [Hugging Face](https://huggingface.co/teticio/audio-encoder) hub.
+
 **UPDATE**: Check out the results after applying to 320,000 tracks on Spotify [here](https://deej-ai.online). The code for the website is available [here](https://github.com/teticio/deej-ai.online-app).
 
 ### Motivation
