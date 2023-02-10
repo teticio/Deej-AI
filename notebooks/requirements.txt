@@ -40,7 +40,7 @@ html5lib==1.0.1
 idna==2.10
 ipaddr==2.2.0
 ipykernel==5.3.4
-ipython==7.18.1
+ipython==8.10.0
 ipython-genutils==0.2.0
 itsdangerous==1.1.0
 jedi==0.17.2
