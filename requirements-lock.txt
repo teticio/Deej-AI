@@ -74,5 +74,5 @@ threadpoolctl==3.1.0
 tqdm==4.64.1
 typing_extensions==4.4.0
 urllib3==1.26.13
-Werkzeug==2.2.2
+Werkzeug==2.2.3
 wrapt==1.14.1
