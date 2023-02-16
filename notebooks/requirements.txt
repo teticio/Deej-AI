@@ -114,5 +114,5 @@ umap-learn==0.4.6
 urllib3==1.25.10
 wcwidth==0.2.5
 webencodings==0.5.1
-Werkzeug==1.0.1
+Werkzeug==2.2.3
 wrapt==1.12.1
