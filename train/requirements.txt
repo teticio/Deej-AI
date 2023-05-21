@@ -1,0 +1,9 @@
+pandas
+spotipy
+tqdm
+requests
+gensim
+pyyaml
+audiodiffusion
+pytorch-lightning
+boto3
