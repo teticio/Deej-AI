@@ -16,15 +16,15 @@ from tensorflow.keras.models import Sequential
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--tf_model",
-        type=str,
-        default="models/speccy_model",
-        help="TensorFlow model path",
-    )
-    parser.add_argument(
         "--pt_model",
         type=str,
         default="models/audio-encoder",
+        help="TensorFlow model path",
+    )
+    parser.add_argument(
+        "--tf_model",
+        type=str,
+        default="models/speccy_model",
         help="TensorFlow model path",
     )
     args = parser.parse_args()

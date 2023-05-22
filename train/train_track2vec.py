@@ -53,6 +53,12 @@ class Logger(CallbackAny2Vec):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
+        "--config_file",
+        type=str,
+        default="config/track2vec.yaml",
+        help="Model configuation file",
+    )
+    parser.add_argument(
         "--dedup_playlists_file",
         type=str,
         default="data/playlists_dedup.csv",
@@ -65,22 +71,16 @@ if __name__ == "__main__":
         help="Deduplicated tracks CSV file",
     )
     parser.add_argument(
-        "--config_file",
-        type=str,
-        default="config/track2vec.yaml",
-        help="Model configuation file",
+        "--max_workers",
+        type=int,
+        default=os.cpu_count() if os.cpu_count() is not None else 1,
+        help="Maximum number of cores to use",
     )
     parser.add_argument(
         "--model_file",
         type=str,
         default="models/track2vec",
         help="Model save file without extension",
-    )
-    parser.add_argument(
-        "--max_workers",
-        type=int,
-        default=os.cpu_count() if os.cpu_count() is not None else 1,
-        help="Maximum number of cores to use",
     )
     args = parser.parse_args()
 

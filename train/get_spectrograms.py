@@ -17,16 +17,22 @@ def get_spectrogram(mp3_file, previews_dir, spectrograms_dir, mel):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
+        "--config_file",
+        type=str,
+        default="config/mp3tovec.yaml",
+        help="Model configuation file",
+    )
+    parser.add_argument(
         "--dedup_tracks_file",
         type=str,
         default="data/tracks_dedup.csv",
         help="Deduplicated tracks CSV file",
     )
     parser.add_argument(
-        "--config_file",
-        type=str,
-        default="config/mp3tovec.yaml",
-        help="Model configuation file",
+        "--max_workers",
+        type=int,
+        default=os.cpu_count() if os.cpu_count() is not None else 1,
+        help="Maximum number of cores to use",
     )
     parser.add_argument(
         "--previews_dir",
@@ -39,12 +45,6 @@ if __name__ == "__main__":
         type=str,
         default="spectrograms",
         help="Directory to save spectrograms",
-    )
-    parser.add_argument(
-        "--max_workers",
-        type=int,
-        default=os.cpu_count() if os.cpu_count() is not None else 1,
-        help="Maximum number of cores to use",
     )
     args = parser.parse_args()
 

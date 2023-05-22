@@ -56,11 +56,14 @@ Then you can train the model with
 python train/train_mp3tovec.py
 ```
 
-# TODO
+Finally, use this script to get the spotify2vec embeddings for the previews.
+```bash
+python train/get_spotify2vec.py
+```
 
-* Train mp3tovec
-* Run model on Spotify previews in parallel
-* config for AudioEncoder
-* Tensorboard
-* Remove missing tracks
-* Script to map from PyTorch to TensorFlow
+The mp3tovec model can be converted from PyTorch to TensorFlow with
+```bash
+python train/pt_to_tf.py
+```
+
+The `mp3tovec.p`, `track2vec.p`, `tracks.csv` and `speccymodel` files are installed to the directory where `deej-ai.online` is running with the following command. This also ensures that there are the same tracks in all the files.

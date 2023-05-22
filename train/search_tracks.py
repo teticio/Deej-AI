@@ -9,16 +9,16 @@ pd.set_option("display.max_rows", 1000)
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--tracks_file",
-        type=str,
-        default="data/tracks.csv",
-        help="Tracks CSV file",
-    )
-    parser.add_argument(
         "--search",
         type=str,
         required=True,
         help="Search string",
+    )
+    parser.add_argument(
+        "--tracks_file",
+        type=str,
+        default="data/tracks.csv",
+        help="Tracks CSV file",
     )
     args = parser.parse_args()
 

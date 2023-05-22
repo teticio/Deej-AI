@@ -34,6 +34,7 @@ def get_following_and_followers(user, cookie):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--cookie", type=str, required=True, help="sp_dc cookie")
+    parser.add_argument("--limit", type=int, default=None, help="Limit number of users")
     parser.add_argument("--user", type=str, required=True, help="Seed user")
     parser.add_argument(
         "--users_file",
@@ -41,7 +42,6 @@ if __name__ == "__main__":
         default="data/users.csv",
         help="Users CSV file",
     )
-    parser.add_argument("--limit", type=int, default=None, help="Limit number of users")
     args = parser.parse_args()
 
     users = set([args.user])

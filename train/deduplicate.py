@@ -12,18 +12,6 @@ csv.field_size_limit(1000000)
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--playlists_file",
-        type=str,
-        default="data/playlists.csv",
-        help="Playlists CSV file",
-    )
-    parser.add_argument(
-        "--tracks_file",
-        type=str,
-        default="data/tracks.csv",
-        help="Tracks CSV file",
-    )
-    parser.add_argument(
         "--dedup_playlists_file",
         type=str,
         default="data/playlists_dedup.csv",
@@ -36,21 +24,33 @@ if __name__ == "__main__":
         help="Deduplicated tracks CSV file",
     )
     parser.add_argument(
+        "-drop_missing_urls",
+        action="store_true",
+        help="Drop tracks with missing URLs",
+    )
+    parser.add_argument(
         "--min_count",
         type=int,
         default=10,
         help="Number of times track must appear in playlists to be included",
     )
     parser.add_argument(
-        "-drop_missing_urls",
-        action="store_true",
-        help="Drop tracks with missing URLs",
-    )
-    parser.add_argument(
         "--oov",
         type=str,
         default=None,
         help="ID for out-of-vocabulary track or None to skip",
+    )
+    parser.add_argument(
+        "--playlists_file",
+        type=str,
+        default="data/playlists.csv",
+        help="Playlists CSV file",
+    )
+    parser.add_argument(
+        "--tracks_file",
+        type=str,
+        default="data/tracks.csv",
+        help="Tracks CSV file",
     )
     args = parser.parse_args()
 

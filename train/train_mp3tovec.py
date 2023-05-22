@@ -118,16 +118,22 @@ class TestCallback(Callback):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
+        "--config_file",
+        type=str,
+        default="config/mp3tovec.yaml",
+        help="Model configuation file",
+    )
+    parser.add_argument(
         "--dedup_tracks_file",
         type=str,
         default="data/tracks_dedup.csv",
         help="Deduplicated tracks CSV file",
     )
     parser.add_argument(
-        "--config_file",
+        "--mp3tovec_model_dir",
         type=str,
-        default="config/mp3tovec.yaml",
-        help="Model configuation file",
+        default="models",
+        help="MP3toVec model save directory",
     )
     parser.add_argument(
         "--spectrograms_dir",
@@ -142,22 +148,10 @@ if __name__ == "__main__":
         help="Track2Vec model file",
     )
     parser.add_argument(
-        "--mp3tovec_model_file",
-        type=str,
-        default="models/track2vec",
-        help="MP3toVec model save file",
-    )
-    parser.add_argument(
         "--tracks_file",
         type=str,
         default="data/tracks_dedup.csv",
         help="Tracks CSV file",
-    )
-    parser.add_argument(
-        "--max_workers",
-        type=int,
-        default=min(5, os.cpu_count()),
-        help="Maximum number of cores to use in DataLoader",
     )
     args = parser.parse_args()
 
@@ -181,11 +175,11 @@ if __name__ == "__main__":
     )
     test_callback = TestCallback(tracks, track2vec_model, test_track_ids, test_batch)
     checkpoint_callback = ModelCheckpoint(
-        save_top_k=3,
+        save_top_k=1,
         monitor="val_loss",
         mode="min",
-        dirpath=args.mp3tovec_model_file,
-        filename="mp3tovec-{epoch:02d}-{val_loss:.2f}",
+        dirpath=args.mp3tovec_model_dir,
+        filename="mp3tovec",
     )
 
     model = Mp3ToVecModel()

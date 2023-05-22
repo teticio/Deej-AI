@@ -10,10 +10,7 @@ from utils import get_access_token, paginate
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--users_file",
-        type=str,
-        default="data/users.csv",
-        help="Input users CSV file",
+        "--limit", type=int, default=None, help="Limit number of playlists"
     )
     parser.add_argument(
         "--playlists_file",
@@ -28,7 +25,10 @@ if __name__ == "__main__":
         help="Start from user index",
     )
     parser.add_argument(
-        "--limit", type=int, default=None, help="Limit number of playlists"
+        "--users_file",
+        type=str,
+        default="data/users.csv",
+        help="Input users CSV file",
     )
     args = parser.parse_args()
 

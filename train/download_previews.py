@@ -21,12 +21,6 @@ def download_file(track_id, track_url, dir):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--tracks_file",
-        type=str,
-        default="data/tracks_dedup.csv",
-        help="Tracks CSV file",
-    )
-    parser.add_argument(
         "--max_workers",
         type=int,
         default=os.cpu_count() if os.cpu_count() is not None else 1,
@@ -37,6 +31,12 @@ def main():
         type=str,
         default="previews",
         help="Directory to save previews",
+    )
+    parser.add_argument(
+        "--tracks_file",
+        type=str,
+        default="data/tracks_dedup.csv",
+        help="Tracks CSV file",
     )
     args = parser.parse_args()
 

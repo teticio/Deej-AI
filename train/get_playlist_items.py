@@ -50,16 +50,10 @@ def get_playlist_items(playlist_id, limit=50, offset=0, proxy=None):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--playlists_file",
-        type=str,
-        default="data/playlists.csv",
-        help="Playlists CSV file",
-    )
-    parser.add_argument(
-        "--tracks_file",
-        type=str,
-        default="data/tracks.csv",
-        help="Tracks CSV file",
+        "--batch_size",
+        type=int,
+        default=10000,
+        help="Batch size",
     )
     parser.add_argument(
         "--max_workers",
@@ -68,16 +62,22 @@ def main():
         help="Maximum number of cores to use",
     )
     parser.add_argument(
+        "--playlists_file",
+        type=str,
+        default="data/playlists.csv",
+        help="Playlists CSV file",
+    )
+    parser.add_argument(
         "--proxy",
         type=str,
         default=None,
         help="Proxy lambda function (see https://github.com/teticio/lambda-scraper)",
     )
     parser.add_argument(
-        "--batch_size",
-        type=int,
-        default=10000,
-        help="Batch size",
+        "--tracks_file",
+        type=str,
+        default="data/tracks.csv",
+        help="Tracks CSV file",
     )
     args = parser.parse_args()
 
