@@ -52,7 +52,8 @@ python train/get_spectrograms.py
 ```
 
 Then you can train the model with
-```bash train/train_mp3tovec.py```
+```bash
+python train/train_mp3tovec.py
 ```
 
 # TODO
