@@ -1,6 +1,7 @@
 import argparse
 import concurrent.futures
 import os
+from time import sleep
 
 import yaml
 from audiodiffusion.mel import Mel
@@ -54,7 +55,7 @@ if __name__ == "__main__":
 
     mp3_files = os.listdir(args.previews_dir)
     os.makedirs(args.spectrograms_dir, exist_ok=True)
-    already_done = os.listdir(args.spectrograms_dir)
+    already_done = set(os.listdir(args.spectrograms_dir))
 
     with concurrent.futures.ProcessPoolExecutor(
         max_workers=args.max_workers
@@ -63,8 +64,9 @@ if __name__ == "__main__":
             executor.submit(
                 get_spectrogram, mp3_file, args.previews_dir, args.spectrograms_dir, mel
             ): mp3_file
-            for mp3_file in mp3_files
+            for mp3_file in tqdm(mp3_files, desc="Setting up jobs")
             if f"{mp3_file[: -len('.mp3')]}.png" not in already_done
+            and sleep(1e-4) is None
         }
         for future in tqdm(
             concurrent.futures.as_completed(futures), total=len(futures)

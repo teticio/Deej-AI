@@ -29,7 +29,9 @@ class Mp3Dataset(Dataset):
         mp3_file = self.files[idx]
 
         image = torch.rand((1, 216, 256))
-        image = Image.open(os.path.join(self.dir, f"{mp3_file[: -len('.mp3')]}.png"), mode="L")
+        image = Image.open(
+            os.path.join(self.dir, f"{mp3_file[: -len('.mp3')]}.png"), mode="L"
+        )
         image = np.frombuffer(image.tobytes(), dtype="uint8").reshape(
             (1, image.height, image.width)
         )

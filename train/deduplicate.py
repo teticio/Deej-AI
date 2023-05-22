@@ -3,7 +3,6 @@ import csv
 
 import pandas as pd
 from tqdm import tqdm
-
 from utils import read_playlists
 
 # for really long playlists!

@@ -1,11 +1,11 @@
 import csv
 import json
+import traceback
 from base64 import b64decode
 from time import sleep
 
 import boto3
 import requests
-import traceback
 from tqdm import tqdm
 
 # for really long playlists!

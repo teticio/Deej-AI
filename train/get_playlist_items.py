@@ -6,20 +6,13 @@ import concurrent.futures
 import gc
 import json
 import os
-from time import sleep
 import traceback
+from time import sleep
 
 import requests
 from tqdm import tqdm
-from utils import (
-    get_access_token,
-    paginate,
-    read_playlists,
-    read_tracks,
-    request_with_proxy,
-    write_playlists,
-    write_tracks,
-)
+from utils import (get_access_token, paginate, read_playlists, read_tracks,
+                   request_with_proxy, write_playlists, write_tracks)
 
 access_token = None
 
@@ -106,7 +99,7 @@ def main():
                 executor.submit(
                     paginate,
                     get_playlist_items,
-                    delay=1,
+                    delay=0.1,
                     playlist_id=playlist_id,
                     proxy=f"{args.proxy}-{i % args.max_workers}"
                     if args.proxy

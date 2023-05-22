@@ -46,11 +46,20 @@ python train/track2vec.py
 python train/test2vec.py
 ```
 
+To train the mp3tovec model, you will first need to get the spectograms of the first 5 seconds of the previews.
+```bash
+python train/get_spectrograms.py
+```
+
+Then you can train the model with
+```bash train/train_mp3tovec.py```
+```
+
 # TODO
 
-* Writing out tracks is very slow!
-* Prepare dataset
 * Train mp3tovec
-* Run model on Spotify previews
+* Run model on Spotify previews in parallel
 * config for AudioEncoder
 * Tensorboard
+* Remove missing tracks
+* Script to map from PyTorch to TensorFlow

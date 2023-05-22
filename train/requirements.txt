@@ -1,9 +1,10 @@
-pandas
-spotipy
-tqdm
-requests
-gensim
-pyyaml
 audiodiffusion
-pytorch-lightning
 boto3
+gensim
+pandas
+pytorch-lightning
+pyyaml
+requests
+spotipy
+tensorflow
+tqdm
