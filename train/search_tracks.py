@@ -7,6 +7,7 @@ pd.set_option("display.max_rows", 1000)
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
     parser.add_argument(
         "--tracks_file",
         type=str,
