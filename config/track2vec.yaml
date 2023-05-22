@@ -6,7 +6,7 @@ model:
   sg: 0               # Skip-gram (1) or Continuous Bag Of Words (0)
 
 data:
-  valid_examples:
+  test_track_ids:
   - "3EYOJ48Et32uATr9ZmLnAo"  # The Police - Roxanne
   - "3Ti0GdlrotgwsAVBBugv0I"  # A Tribe Called Quest - Can I Kick It?
   - "5XeSAezNDk9tuw3viiCbZ3"  # James Brown - Get Up Offa That Thing

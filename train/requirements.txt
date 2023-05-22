@@ -2,7 +2,7 @@ audiodiffusion
 boto3
 gensim
 pandas
-pytorch-lightning
+lightning
 pyyaml
 requests
 spotipy

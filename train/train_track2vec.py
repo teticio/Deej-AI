@@ -38,7 +38,7 @@ class Logger(CallbackAny2Vec):
         model.save(self.args.model_file)
         # inference doesn't work properly unless we load the model from disk
         model = gensim.models.Word2Vec.load(self.args.model_file)
-        for track_id in self.config["data"]["valid_examples"]:
+        for track_id in self.config["data"]["test_track_ids"]:
             print(
                 f"\u001b]8;;{self.tracks[track_id]['url']}\u001b\\{self.tracks[track_id]['artist']} - {self.tracks[track_id]['title']}\u001b]8;;\u001b\\"
             )

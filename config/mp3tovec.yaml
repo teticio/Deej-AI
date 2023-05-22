@@ -6,7 +6,7 @@ mel:
 
 data:
   batch_size: 32
-  valid_examples:
+  test_track_ids:
   - "3EYOJ48Et32uATr9ZmLnAo"  # The Police - Roxanne
   - "3Ti0GdlrotgwsAVBBugv0I"  # A Tribe Called Quest - Can I Kick It?
   - "5XeSAezNDk9tuw3viiCbZ3"  # James Brown - Get Up Offa That Thing
@@ -25,6 +25,6 @@ data:
   - "4SHZsQIdS2N1E5yqvoXF8o"  # Andy Williams - Can't Take My Eyes Off You
 
 trainer:
-  max_epochs: 10
+  max_epochs: 100
   accelerator: gpu
   devices: 1
