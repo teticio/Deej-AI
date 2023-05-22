@@ -5,8 +5,8 @@ import os
 import pickle
 from time import sleep
 
-from audiodiffusion.audio_encoder import AudioEncoder
 import torch
+from audiodiffusion.audio_encoder import AudioEncoder
 from tqdm import tqdm
 
 
@@ -62,9 +62,7 @@ def main():
     ) as executor:
         futures = {
             executor.submit(encode_file, model, mp3_file, args.previews_dir): mp3_file
-            for mp3_file in tqdm(
-                os.listdir(args.previews_dir), desc="Setting up jobs"
-            )
+            for mp3_file in tqdm(os.listdir(args.previews_dir), desc="Setting up jobs")
             if f"{mp3_file[:-len('.mp3')]}" not in mp3tovec and sleep(1e-4) is None
         }
         for future in tqdm(

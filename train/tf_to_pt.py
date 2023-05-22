@@ -17,7 +17,7 @@ if __name__ == "__main__":
         "--pt_model",
         type=str,
         default="models/audio-encoder",
-        help="TensorFlow model path",
+        help="PyTorch model path",
     )
     parser.add_argument(
         "--tf_model",

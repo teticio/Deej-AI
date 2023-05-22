@@ -3,8 +3,8 @@ import os
 import pickle
 
 import gensim
-import numpy as np
 import lightning.pytorch as pl
+import numpy as np
 import torch
 import yaml
 from audiodiffusion.audio_encoder import AudioEncoder

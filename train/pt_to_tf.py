@@ -18,13 +18,13 @@ if __name__ == "__main__":
     parser.add_argument(
         "--pt_model",
         type=str,
-        default="models/audio-encoder",
-        help="TensorFlow model path",
+        default="models/mp3tovec.ckpt",
+        help="PyTorch model path",
     )
     parser.add_argument(
         "--tf_model",
         type=str,
-        default="models/speccy_model",
+        default="models/speccymodel",
         help="TensorFlow model path",
     )
     args = parser.parse_args()

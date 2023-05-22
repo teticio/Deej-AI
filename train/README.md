@@ -66,4 +66,4 @@ The mp3tovec model can be converted from PyTorch to TensorFlow with
 python train/pt_to_tf.py
 ```
 
-The `mp3tovec.p`, `track2vec.p`, `tracks.csv` and `speccymodel` files are installed to the directory where `deej-ai.online` is running with the following command. This also ensures that there are the same tracks in all the files.
+The `mp3tovec.p`, `track2vec.p`, `tracks.csv` and `speccy_model` files are installed to the directory where `deej-ai.online` is running with the following command. This also ensures that there are the same tracks in all the files.
