@@ -40,6 +40,12 @@ def main():
         default="previews",
         help="Directory of MP3 files",
     )
+    parser.add_argument(
+        "--save_every",
+        type=int,
+        default=10000,
+        help="Save MP3ToVecs every N MP3s",
+    )
     args = parser.parse_args()
 
     model = AudioEncoder()
@@ -65,14 +71,16 @@ def main():
             for mp3_file in tqdm(os.listdir(args.mp3s_dir), desc="Setting up jobs")
             if f"{mp3_file[:-len('.mp3')]}" not in mp3tovecs and sleep(1e-4) is None
         }
-        for future in tqdm(
+        for i, future in enumerate(tqdm(
             concurrent.futures.as_completed(futures),
             total=len(futures),
             desc="Encoding MP3s",
-        ):
+        )):
             mp3_file = futures[future]
             try:
                 mp3tovecs[mp3_file[: -len(".mp3")]] = future.result()
+                if (i + 1) % args.save_every == 0:
+                    pickle.dump(mp3tovecs, open(args.mp3tovecs_file, "wb"))
             except KeyboardInterrupt:
                 break
             except Exception:
