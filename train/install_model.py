@@ -11,7 +11,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--deejai_model_dir",
         type=str,
-        default="../deej-ai.online-app/model",
+        default="../deej-ai.online-dev/model",
         help="defj-ai.online model directory",
     )
     parser.add_argument(
