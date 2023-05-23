@@ -40,13 +40,13 @@ Use this script to find particular tracks (useful for model evaluation - see `co
 python train/search_tracks.py --search="James Brown"
 ```
 
-Now you can train a track2vec model with
+Now you can train a Track2Vec model with
 ```bash
 python train/track2vec.py
 python train/test2vec.py
 ```
 
-To train the mp3tovec model, you will first need to get the spectograms of the first 5 seconds of the previews.
+To train the MP3toVec model, you will first need to get the spectograms of the first 5 seconds of the previews.
 ```bash
 python train/get_spectrograms.py
 ```
@@ -56,7 +56,7 @@ Then you can train the model with
 python train/train_mp3tovec.py
 ```
 
-Finally, use this script to get the spotify2vec embeddings for the previews.
+Finally, use this script to get the Spotify2Vec embeddings for the previews.
 ```bash
 python train/get_spotify2vec.py
 ```
@@ -66,4 +66,7 @@ The mp3tovec model can be converted from PyTorch to TensorFlow with
 python train/pt_to_tf.py
 ```
 
-The `mp3tovec.p`, `track2vec.p`, `tracks.csv` and `speccy_model` files are installed to the directory where `deej-ai.online` is running with the following command. This also ensures that there are the same tracks in all the files.
+The `spotifytovec.p`, `tracktovec.p`, `spotify_tracks.p`, `spotify_urls.p` and `speccy_model` files are installed to the directory where `deej-ai.online` is running with the following command. This also ensures that there are the same tracks in all the files.
+```bash
+python train/install_model.py
+```
