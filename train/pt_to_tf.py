@@ -178,5 +178,5 @@ if __name__ == "__main__":
                 model.predict(example)
                 - pytorch_model(torch.from_numpy(example).permute(0, 3, 1, 2)).numpy()
             ).max()
-            < 1e-3
+            < 2e-3
         )

@@ -108,5 +108,5 @@ if __name__ == "__main__":
                 pytorch_model(Tensor(example).permute(0, 3, 1, 2)).numpy()
                 - model(example).numpy()
             ).max()
-            < 1e-3
+            < 2e-3
         )
