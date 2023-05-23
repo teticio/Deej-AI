@@ -5,7 +5,6 @@ import shutil
 
 from utils import read_tracks
 
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -43,7 +42,7 @@ if __name__ == "__main__":
     track2vec = pickle.load(open(f"{args.track2vec_file}", "rb"))
     spotify2vec = pickle.load(open(f"{args.spotify2vec_file}", "rb"))
     tracks = read_tracks(args.tracks_file)
-    
+
     common_tracks = set(track2vec.keys()).intersection(set(spotify2vec.keys()))
     print(f"{len(common_tracks)} tracks")
     to_delete = set(track2vec.keys()).difference(common_tracks)
@@ -57,10 +56,23 @@ if __name__ == "__main__":
     spotify_tracks = {}
     for track_id in common_tracks:
         spotify_urls[track_id] = tracks[track_id]["url"]
-        spotify_tracks[track_id] = f"{tracks[track_id]['artist']} - {tracks[track_id]['title']}"
+        spotify_tracks[
+            track_id
+        ] = f"{tracks[track_id]['artist']} - {tracks[track_id]['title']}"
 
-    pickle.dump(track2vec, open(os.path.join(args.deejai_model_dir, "tracktovec.p"), "wb"))
-    pickle.dump(spotify2vec, open(os.path.join(args.deejai_model_dir, "spotifytovec.p"), "wb"))
-    pickle.dump(spotify_urls, open(os.path.join(args.deejai_model_dir, "spotify_urls.p"), "wb"))
-    pickle.dump(spotify_tracks, open(os.path.join(args.deejai_model_dir, "spotify_tracks.p"), "wb"))
-    shutil.copyfile(args.mp3tovec_model_file, os.path.join(args.deejai_model_dir, "speccy_model"))
+    pickle.dump(
+        track2vec, open(os.path.join(args.deejai_model_dir, "tracktovec.p"), "wb")
+    )
+    pickle.dump(
+        spotify2vec, open(os.path.join(args.deejai_model_dir, "spotifytovec.p"), "wb")
+    )
+    pickle.dump(
+        spotify_urls, open(os.path.join(args.deejai_model_dir, "spotify_urls.p"), "wb")
+    )
+    pickle.dump(
+        spotify_tracks,
+        open(os.path.join(args.deejai_model_dir, "spotify_tracks.p"), "wb"),
+    )
+    shutil.copyfile(
+        args.mp3tovec_model_file, os.path.join(args.deejai_model_dir, "speccy_model")
+    )

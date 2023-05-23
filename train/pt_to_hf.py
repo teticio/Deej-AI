@@ -8,7 +8,6 @@ import torch
 from audiodiffusion.audio_encoder import AudioEncoder
 from huggingface_hub import HfFolder, Repository, whoami
 
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(

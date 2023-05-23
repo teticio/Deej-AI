@@ -71,11 +71,13 @@ def main():
             for mp3_file in tqdm(os.listdir(args.mp3s_dir), desc="Setting up jobs")
             if f"{mp3_file[:-len('.mp3')]}" not in mp3tovecs and sleep(1e-4) is None
         }
-        for i, future in enumerate(tqdm(
-            concurrent.futures.as_completed(futures),
-            total=len(futures),
-            desc="Encoding MP3s",
-        )):
+        for i, future in enumerate(
+            tqdm(
+                concurrent.futures.as_completed(futures),
+                total=len(futures),
+                desc="Encoding MP3s",
+            )
+        ):
             mp3_file = futures[future]
             try:
                 mp3tovecs[mp3_file[: -len(".mp3")]] = future.result()
@@ -87,6 +89,7 @@ def main():
                 print(f"Skipping {mp3_file}")
 
     pickle.dump(mp3tovecs, open(args.mp3tovecs_file, "wb"))
+
 
 if __name__ == "__main__":
     main()
