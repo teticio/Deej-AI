@@ -43,7 +43,7 @@ def main():
     parser.add_argument(
         "--save_every",
         type=int,
-        default=10000,
+        default=1000,
         help="Save MP3ToVecs every N MP3s",
     )
     args = parser.parse_args()
