@@ -68,7 +68,7 @@ def main():
         for future in tqdm(
             concurrent.futures.as_completed(futures),
             total=len(futures),
-            desc="Encoding previews",
+            desc="Encoding MP3s",
         ):
             mp3_file = futures[future]
             try:
