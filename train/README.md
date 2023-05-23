@@ -19,13 +19,14 @@ python train/get_playlists.py --limit=1000000
 Then the following script will download the track lists for these playlists. This can take weeks to run on a single CPU core. In order to run in parallel, it is necessary to use a proxy pool, otherwise Spotify will throttle the requests (see https://github.com/teticio/lambda-scraper).
 
 ```bash
+# Assuming you have 32 cores and have deployed Lambda functions proxy-0 ... proxy-31 for the proxy pool 
 python train/get_playlist_items.py --max_workers=32 --proxy=proxy
 ```
 
 To de-duplicate tracks by the same artist with the same title and drop tracks with no preview URL or less than 10 references, run the following script. The track IDs in playlists for dropped tracks will be replaced with an ID specified by `--oov` or skipped if this is not set.
 
 ```bash
-python train/deduplicate.py --min_count=10 -drop_missing_urls
+python train/deduplicate.py --min_count=10
 ```
 
 Now you can download the 30 second previews of these tracks. Each preview is around 350k in size.
@@ -46,9 +47,9 @@ python train/track2vec.py
 python train/test2vec.py
 ```
 
-To train the MP3ToVec model, you will first need to get the spectograms of the first 5 seconds of the previews.
+To train the MP3ToVec model, you will first need to calculate the spectograms of the first 5 seconds of the previews.
 ```bash
-python train/get_spectrograms.py
+python train/calc_spectrograms.py
 ```
 
 Then you can train the model with
@@ -56,12 +57,17 @@ Then you can train the model with
 python train/train_mp3tovec.py
 ```
 
-Finally, use this script to get the Spotify2Vec embeddings for the previews. Note that this does not include the TF-IDF part of the algorithm (see `MP3ToVec.py`) as this make little difference to the results as the previews are only 30 seconds long. It is also very time consuming to calculate and can neagtively impact the ability of the model to recognize a track that is playing from its preview alone.
+Finally, use this script to calculate the Mp3ToVec embeddings for the previews.
 ```bash
-python train/get_spotify2vec.py
+python train/calc_mp3tovecs.py
 ```
 
-The mp3tovec model can be converted from PyTorch to TensorFlow with
+To reduce these to a single vector per track using the TF-IDF algorithm, run
+```bash
+python train/calc_tfidf.py
+```
+
+The MP3ToVec model can be converted from PyTorch to TensorFlow with
 ```bash
 python train/pt_to_tf.py
 ```

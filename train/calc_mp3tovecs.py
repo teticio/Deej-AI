@@ -11,7 +11,7 @@ from tqdm import tqdm
 
 
 def encode_file(model, mp3_file, dir):
-    return model.encode([os.path.join(dir, mp3_file)])[0].cpu().numpy()
+    return model.encode([os.path.join(dir, mp3_file)], pool=None)[0].cpu().numpy()
 
 
 def main():
@@ -23,22 +23,22 @@ def main():
         help="Maximum number of cores to use",
     )
     parser.add_argument(
-        "--spotifytovec_file",
-        type=str,
-        default="models/spotify2vec.p",
-        help="SpotifytoVec file",
-    )
-    parser.add_argument(
         "--mp3tovec_model_file",
         type=str,
         default="models/mp3tovec.ckpt",
         help="MP3ToVec model file",
     )
     parser.add_argument(
-        "--previews_dir",
+        "--mp3tovecs_file",
+        type=str,
+        default="models/mp3tovecs.p",
+        help="Mp3ToVecs output file",
+    )
+    parser.add_argument(
+        "--mp3s_dir",
         type=str,
         default="previews",
-        help="Directory to save previews",
+        help="Directory of MP3 files",
     )
     args = parser.parse_args()
 
@@ -50,9 +50,9 @@ def main():
         }
     )
 
-    mp3tovec = (
-        pickle.loads(open(args.spotifytovec_file, "rb"))
-        if os.path.exists(args.spotifytovec_file)
+    mp3tovecs = (
+        pickle.loads(open(args.mp3tovecs_file, "rb"))
+        if os.path.exists(args.mp3tovecs_file)
         else {}
     )
 
@@ -61,9 +61,9 @@ def main():
         max_workers=args.max_workers
     ) as executor:
         futures = {
-            executor.submit(encode_file, model, mp3_file, args.previews_dir): mp3_file
-            for mp3_file in tqdm(os.listdir(args.previews_dir), desc="Setting up jobs")
-            if f"{mp3_file[:-len('.mp3')]}" not in mp3tovec and sleep(1e-4) is None
+            executor.submit(encode_file, model, mp3_file, args.mp3s_dir): mp3_file
+            for mp3_file in tqdm(os.listdir(args.mp3s_dir), desc="Setting up jobs")
+            if f"{mp3_file[:-len('.mp3')]}" not in mp3tovecs and sleep(1e-4) is None
         }
         for future in tqdm(
             concurrent.futures.as_completed(futures),
@@ -72,12 +72,13 @@ def main():
         ):
             mp3_file = futures[future]
             try:
-                mp3tovec[mp3_file[: -len(".mp3")]] = future.result()
+                mp3tovecs[mp3_file[: -len(".mp3")]] = future.result()
             except KeyboardInterrupt:
                 break
             except Exception:
                 print(f"Skipping {mp3_file}")
 
+    pickle.dump(mp3tovecs, open(args.mp3tovecs_file, "wb"))
 
 if __name__ == "__main__":
     main()

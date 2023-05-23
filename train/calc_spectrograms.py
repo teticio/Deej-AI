@@ -8,7 +8,7 @@ from audiodiffusion.mel import Mel
 from tqdm import tqdm
 
 
-def get_spectrogram(mp3_file, previews_dir, spectrograms_dir, mel):
+def calc_spectrogram(mp3_file, previews_dir, spectrograms_dir, mel):
     mel.load_audio(os.path.join(previews_dir, mp3_file))
     image = mel.audio_slice_to_image(slice=0, ref=mel.n_fft // 2)
     image.save(os.path.join(spectrograms_dir, mp3_file[: -len(".mp3")] + ".png"))
@@ -56,7 +56,7 @@ if __name__ == "__main__":
     ) as executor:
         futures = {
             executor.submit(
-                get_spectrogram, mp3_file, args.previews_dir, args.spectrograms_dir, mel
+                calc_spectrogram, mp3_file, args.previews_dir, args.spectrograms_dir, mel
             ): mp3_file
             for mp3_file in tqdm(mp3_files, desc="Setting up jobs")
             if f"{mp3_file[: -len('.mp3')]}.png" not in already_done

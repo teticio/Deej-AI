@@ -24,8 +24,9 @@ if __name__ == "__main__":
         help="Deduplicated tracks CSV file",
     )
     parser.add_argument(
-        "-drop_missing_urls",
-        action="store_true",
+        "--drop_missing_urls",
+        type=bool,
+        default=True,
         help="Drop tracks with missing URLs",
     )
     parser.add_argument(

@@ -21,10 +21,10 @@ if __name__ == "__main__":
         help="MP3ToVec model file",
     )
     parser.add_argument(
-        "--spotify2vec_file",
+        "--mp3tovec_file",
         type=str,
-        default="models/spotify2vec.p",
-        help="Spotify2Vec file",
+        default="models/mp3tovec.p",
+        help="MP3ToVec file",
     )
     parser.add_argument(
         "--track2vec_file",
