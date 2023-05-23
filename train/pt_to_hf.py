@@ -48,7 +48,8 @@ if __name__ == "__main__":
         },
     )
 
-    audio_encoder.save_pretrained(args.output_dir)
     if args.push_to_hub:
         repo = Repository(args.output_dir, clone_from=args.hub_model_id)
+    audio_encoder.save_pretrained(args.output_dir)
+    if args.push_to_hub:
         repo.push_to_hub(whoami())
