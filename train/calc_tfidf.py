@@ -1,8 +1,64 @@
 import argparse
+import concurrent.futures
 import os
 import pickle
+from time import sleep
 
 import numpy as np
+from tqdm import tqdm
+
+
+def calc_idf(mp3s, mp3_indices, close):
+    vec_in_mp3 = np.zeros((close.shape[0], len(mp3s)))
+    for i, mp3 in enumerate(mp3s):
+        vec_in_mp3[:, i] = close[:, mp3_indices[mp3]].any(axis=1)
+    idfs = -np.log((vec_in_mp3.sum(axis=1)) / len(mp3s))
+    return idfs
+
+
+def calc_tf_and_mp3tovec(mp3s, mp3_indices, close, idfs, mp3_vecs):
+    mp3tovec = {}
+    for mp3 in mp3s:
+        close_for_indices = close[mp3_indices[mp3], :][:, mp3_indices[mp3]]
+        tf = np.sum(close_for_indices, axis=1)
+        vec = np.sum(
+            mp3_vecs[mp3_indices[mp3]]
+            * tf[:, np.newaxis]
+            * idfs[mp3_indices[mp3]][:, np.newaxis],
+            axis=0,
+        )
+        mp3tovec[mp3] = vec
+    return mp3tovec
+
+
+def calc_mp3tovec(mp3s, mp3tovecs, epsilon, dims):
+    mp3tovec = {}
+    mp3_indices = {}
+    mp3_vecs = np.empty((sum(len(mp3tovecs[mp3]) for mp3 in mp3s), dims))
+    start = 0
+    for mp3 in mp3s:
+        end = start + len(mp3tovecs[mp3])
+        mp3_vecs[start:end] = np.array(mp3tovecs[mp3])
+        norms = np.linalg.norm(mp3_vecs[start:end], axis=1)
+        mp3_vecs[start:end] /= norms[:, np.newaxis]
+        mp3_indices[mp3] = list(range(start, end))
+        start = end
+    assert start == len(mp3_vecs)
+
+    close = (
+        1
+        - np.einsum(
+            "ij,kj->ik",
+            mp3_vecs.astype(np.float16),
+            mp3_vecs.astype(np.float16),
+            dtype=np.float16,
+        )
+        < epsilon
+    ).astype(bool)
+
+    idfs = calc_idf(mp3s, mp3_indices, close)
+    mp3tovec = calc_tf_and_mp3tovec(mp3s, mp3_indices, close, idfs, mp3_vecs)
+    return mp3tovec
 
 
 def main():
@@ -10,7 +66,7 @@ def main():
     parser.add_argument(
         "--batch_size",
         type=int,
-        default=1000,
+        default=100,
         help="Batch size for TF-IDF calculation",
     )
     parser.add_argument(
@@ -32,6 +88,12 @@ def main():
         help="Mp3ToVecs input file",
     )
     parser.add_argument(
+        "--mp3tovec_file",
+        type=str,
+        default="models/mp3tovec.p",
+        help="Mp3ToVec output file",
+    )
+    parser.add_argument(
         "--pool",
         type=bool,
         default=False,
@@ -39,11 +101,42 @@ def main():
     )
     args = parser.parse_args()
 
-    mp3tovecs = pickle.loads(open(args.mp3tovecs_file, "rb"))
+    mp3tovecs = pickle.load(open(args.mp3tovecs_file, "rb"))
+    dims = mp3tovecs[list(mp3tovecs.keys())[0]][0].shape[0]
 
     if args.pool:
-        mp3tovecs = {k: np.mean(v, axis=0) for k, v in mp3tovecs.items()}
+        mp3tovec = {k: np.mean(v, axis=0) for k, v in mp3tovecs.items()}
     else:
-        assert False, "Not implemented yet"
+        mp3tovec = {}
+        keys = list(mp3tovecs.keys())
 
-    pickle.dump(mp3tovecs, open(args.mp3tovec_file, "wb"))
+        with concurrent.futures.ProcessPoolExecutor(
+            max_workers=args.max_workers
+        ) as executor:
+            futures = {
+                executor.submit(
+                    calc_mp3tovec,
+                    keys[i : i + args.batch_size],
+                    mp3tovecs,
+                    args.epsilon,
+                    dims,
+                ): i
+                for i in tqdm(
+                    range(0, len(mp3tovecs), args.batch_size), desc="Setting up jobs"
+                )
+                if sleep(1e-4) is None
+            }
+            for future in tqdm(
+                concurrent.futures.as_completed(futures),
+                total=len(futures),
+                desc="Calculating TF-IDF",
+            ):
+                futures[future]
+                for k, v in future.result().items():
+                    mp3tovec[k] = v
+
+    pickle.dump(mp3tovec, open(args.mp3tovec_file, "wb"))
+
+
+if __name__ == "__main__":
+    main()

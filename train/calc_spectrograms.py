@@ -56,14 +56,20 @@ if __name__ == "__main__":
     ) as executor:
         futures = {
             executor.submit(
-                calc_spectrogram, mp3_file, args.previews_dir, args.spectrograms_dir, mel
+                calc_spectrogram,
+                mp3_file,
+                args.previews_dir,
+                args.spectrograms_dir,
+                mel,
             ): mp3_file
             for mp3_file in tqdm(mp3_files, desc="Setting up jobs")
             if f"{mp3_file[: -len('.mp3')]}.png" not in already_done
             and sleep(1e-4) is None
         }
         for future in tqdm(
-            concurrent.futures.as_completed(futures), total=len(futures)
+            concurrent.futures.as_completed(futures),
+            total=len(futures),
+            desc="Calculating spectrograms",
         ):
             mp3_file = futures[future]
             try:

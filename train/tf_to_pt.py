@@ -16,7 +16,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--pt_model_file",
         type=str,
-        default="models/temp_mp3tovec.ckpt",
+        default="models/mp3tovec.ckpt",
         help="PyTorch model path",
     )
     parser.add_argument(
