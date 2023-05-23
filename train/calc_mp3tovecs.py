@@ -51,7 +51,7 @@ def main():
     )
 
     mp3tovecs = (
-        pickle.loads(open(args.mp3tovecs_file, "rb"))
+        pickle.load(open(args.mp3tovecs_file, "rb"))
         if os.path.exists(args.mp3tovecs_file)
         else {}
     )
