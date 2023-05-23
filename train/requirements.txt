@@ -1,6 +1,7 @@
 audiodiffusion
 boto3
 gensim
+huggingface-hub
 pandas
 lightning
 pyyaml

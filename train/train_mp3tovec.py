@@ -124,12 +124,6 @@ if __name__ == "__main__":
         help="Model configuation file",
     )
     parser.add_argument(
-        "--dedup_tracks_file",
-        type=str,
-        default="data/tracks_dedup.csv",
-        help="Deduplicated tracks CSV file",
-    )
-    parser.add_argument(
         "--mp3tovec_model_dir",
         type=str,
         default="models",

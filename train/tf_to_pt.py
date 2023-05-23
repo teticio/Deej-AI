@@ -14,13 +14,13 @@ from torch import Tensor
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--pt_model",
+        "--pt_model_file",
         type=str,
-        default="models/audio-encoder",
+        default="models/temp_mp3tovec.ckpt",
         help="PyTorch model path",
     )
     parser.add_argument(
-        "--tf_model",
+        "--tf_model_file",
         type=str,
         default="models/speccy_model",
         help="TensorFlow model path",
@@ -28,7 +28,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     model = load_model(
-        args.tf_model,
+        args.tf_model_file,
         custom_objects={"cosine_proximity": tf.compat.v1.keras.losses.cosine_proximity},
     )
 
@@ -89,7 +89,14 @@ if __name__ == "__main__":
 
     pytorch_model.eval()
     pytorch_model.load_state_dict(new_state_dict, strict=False)
-    pytorch_model.save_pretrained(args.pt_model)
+    torch.save(
+        {
+            "state_dict": {
+                f"model.{k}": v for k, v in pytorch_model.state_dict().items()
+            },
+        },
+        args.pt_model_file,
+    )
 
     # test
     pytorch_model.eval()

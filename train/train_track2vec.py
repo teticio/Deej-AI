@@ -20,7 +20,7 @@ class Logger(CallbackAny2Vec):
         self.loss = 0
         self.tracks = (
             pd.read_csv(
-                args.dedup_tracks_file,
+                args.tracks_file,
                 header=None,
                 index_col=0,
                 names=["artist", "title", "url", "count"],
@@ -59,13 +59,13 @@ if __name__ == "__main__":
         help="Model configuation file",
     )
     parser.add_argument(
-        "--dedup_playlists_file",
+        "--playlists_file",
         type=str,
         default="data/playlists_dedup.csv",
         help="Deduplicated playlists CSV file",
     )
     parser.add_argument(
-        "--dedup_tracks_file",
+        "--tracks_file",
         type=str,
         default="data/tracks_dedup.csv",
         help="Deduplicated tracks CSV file",
@@ -87,7 +87,7 @@ if __name__ == "__main__":
     with open(args.config_file, "r") as stream:
         config = yaml.safe_load(stream)
 
-    with open(args.dedup_playlists_file, "r") as csvfile:
+    with open(args.playlists_file, "r") as csvfile:
         reader = csv.reader(csvfile)
         playlists = [row[1:] for row in reader]
 

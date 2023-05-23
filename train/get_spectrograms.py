@@ -23,12 +23,6 @@ if __name__ == "__main__":
         help="Model configuation file",
     )
     parser.add_argument(
-        "--dedup_tracks_file",
-        type=str,
-        default="data/tracks_dedup.csv",
-        help="Deduplicated tracks CSV file",
-    )
-    parser.add_argument(
         "--max_workers",
         type=int,
         default=os.cpu_count() if os.cpu_count() is not None else 1,

@@ -16,13 +16,13 @@ from tensorflow.keras.models import Sequential
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--pt_model",
+        "--pt_model_file",
         type=str,
         default="models/mp3tovec.ckpt",
         help="PyTorch model path",
     )
     parser.add_argument(
-        "--tf_model",
+        "--tf_model_file",
         type=str,
         default="models/speccymodel",
         help="TensorFlow model path",
@@ -31,7 +31,14 @@ if __name__ == "__main__":
 
     pytorch_model = AudioEncoder()
     pytorch_model.eval()
-    pytorch_model.load_state_dict(torch.load(args.pt_model))
+    pytorch_model.load_state_dict(
+        {
+            k.replace("model.", ""): v
+            for k, v in torch.load(
+                args.pt_model_file, map_location=torch.device("cpu")
+            )["state_dict"].items()
+        },
+    )
 
     input_shape = (96, 216, 1)
     model_input = Input(shape=input_shape, name="input")
@@ -160,7 +167,7 @@ if __name__ == "__main__":
     )
 
     model.compile(loss=cosine_proximity, optimizer="adam")
-    model.save_weights(args.tf_model, save_format="h5")
+    model.save_weights(args.tf_model_file, save_format="h5")
 
     # test
     np.random.seed(42)
