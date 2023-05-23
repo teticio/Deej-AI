@@ -4,7 +4,7 @@
 
 [Robert Dargavel Smith](mailto:teticio@gmail.com) - Advanced Machine Learning end of Masters project ([MBIT School](http://mbitschool.academy), Madrid, Spain)
 
-**UPDATE**: After nearly 5 years, I have finally got around to re-training the model deployed at https://deej-ai.online. The fact that people have been consistently continuing to use it is testament to how well it works, but it was about time I included tracks released since 2018! I have added a `train` directory to this repo where you can find a `README` with detailed instructions on how to obtain datasets and train your own model from scratch.
+**UPDATE**: After nearly 5 years, I have finally got around to re-training the model deployed at https://deej-ai.online. The fact that people have been consistently continuing to use it is testament to how well it works, but it was about time I included tracks released since 2018! I have added a [`train`](train) directory to this repo where you can find a [`README`](train/README.md) with detailed instructions on how to obtain datasets and train your own model from scratch.
 
 **UPDATE**: You can now use this model even more easily than before in the [Hugging Face](https://huggingface.co/teticio/audio-encoder) hub.
 
