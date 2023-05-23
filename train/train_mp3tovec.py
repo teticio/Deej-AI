@@ -127,7 +127,7 @@ if __name__ == "__main__":
         "--mp3tovec_model_dir",
         type=str,
         default="models",
-        help="MP3toVec model save directory",
+        help="MP3ToVec model save directory",
     )
     parser.add_argument(
         "--spectrograms_dir",

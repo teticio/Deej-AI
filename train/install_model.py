@@ -18,7 +18,7 @@ if __name__ == "__main__":
         "--mp3tovec_model_file",
         type=str,
         default="models/mp3tovec.ckpt",
-        help="MP3toVec model file",
+        help="MP3ToVec model file",
     )
     parser.add_argument(
         "--spotify2vec_file",

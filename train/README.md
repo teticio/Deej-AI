@@ -46,7 +46,7 @@ python train/track2vec.py
 python train/test2vec.py
 ```
 
-To train the MP3toVec model, you will first need to get the spectograms of the first 5 seconds of the previews.
+To train the MP3ToVec model, you will first need to get the spectograms of the first 5 seconds of the previews.
 ```bash
 python train/get_spectrograms.py
 ```
@@ -56,7 +56,7 @@ Then you can train the model with
 python train/train_mp3tovec.py
 ```
 
-Finally, use this script to get the Spotify2Vec embeddings for the previews.
+Finally, use this script to get the Spotify2Vec embeddings for the previews. Note that this does not include the TF-IDF part of the algorithm (see `MP3ToVec.py`) as this make little difference to the results as the previews are only 30 seconds long. It is also very time consuming to calculate and can neagtively impact the ability of the model to recognize a track that is playing from its preview alone.
 ```bash
 python train/get_spotify2vec.py
 ```
