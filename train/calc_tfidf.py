@@ -19,15 +19,13 @@ def calc_idf(mp3s, mp3_indices, close):
 def calc_tf_and_mp3tovec(mp3s, mp3_indices, close, idfs, mp3_vecs):
     mp3tovec = {}
     for mp3 in mp3s:
-        close_for_indices = close[mp3_indices[mp3], :][:, mp3_indices[mp3]]
-        tf = np.sum(close_for_indices, axis=1)
-        vec = np.sum(
+        tf = np.sum(close[mp3_indices[mp3], :][:, mp3_indices[mp3]], axis=1)
+        mp3tovec[mp3] = np.sum(
             mp3_vecs[mp3_indices[mp3]]
             * tf[:, np.newaxis]
             * idfs[mp3_indices[mp3]][:, np.newaxis],
             axis=0,
         )
-        mp3tovec[mp3] = vec
     return mp3tovec
 
 
