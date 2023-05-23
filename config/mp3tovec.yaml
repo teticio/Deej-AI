@@ -27,4 +27,4 @@ data:
 trainer:
   max_epochs: 100
   accelerator: gpu
-  devices: 1
+  devices: auto
