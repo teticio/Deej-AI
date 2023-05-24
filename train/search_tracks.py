@@ -17,7 +17,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--tracks_file",
         type=str,
-        default="data/tracks.csv",
+        default="data/tracks_dedup.csv",
         help="Tracks CSV file",
     )
     args = parser.parse_args()
