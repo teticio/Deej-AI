@@ -71,12 +71,12 @@ Then you can train the model with
 python train/train_mp3tovec.py
 ```
 
-Finally, use this script to calculate the Mp3ToVec embeddings for the previews.
+Use this script to calculate the Mp3ToVec embeddings for the previews.
 ```bash
 python train/calc_mp3tovecs.py
 ```
 
-To reduce these to a single vector per track using the TF-IDF algorithm, run
+Finally, to reduce these to a single vector per track using the TF-IDF algorithm, run
 ```bash
 python train/calc_tfidf.py
 ```
