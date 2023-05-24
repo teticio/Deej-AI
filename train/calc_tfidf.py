@@ -97,6 +97,12 @@ def main():
         default=False,
         help="Just pool the vectors taking the average",
     )
+    parser.add_argument(
+        "--save_every",
+        type=int,
+        default=10,
+        help="Save MP3ToVec every N batches",
+    )
     args = parser.parse_args()
 
     mp3tovecs = pickle.load(open(args.mp3tovecs_file, "rb"))
@@ -124,14 +130,18 @@ def main():
                 )
                 if sleep(1e-4) is None
             }
-            for future in tqdm(
-                concurrent.futures.as_completed(futures),
-                total=len(futures),
-                desc="Calculating TF-IDF",
+            for i, future in enumerate(
+                tqdm(
+                    concurrent.futures.as_completed(futures),
+                    total=len(futures),
+                    desc="Calculating TF-IDF",
+                )
             ):
                 futures[future]
                 for k, v in future.result().items():
                     mp3tovec[k] = v
+                if (i + 1) % args.save_every == 0:
+                    pickle.dump(mp3tovec, open(args.mp3tovec_file, "wb"))
 
     pickle.dump(mp3tovec, open(args.mp3tovec_file, "wb"))
 
