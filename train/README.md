@@ -44,7 +44,7 @@ python train/deduplicate.py --min_count=10
 Now you can download the 30 second previews of these tracks. Each preview is around 350k in size.
 
 ```bash
-python train/download_previews.py --min_count=10
+python train/download_previews.py
 ```
 
 Use this script to find particular tracks (useful for model evaluation - see `config/track2vec.yaml`).
