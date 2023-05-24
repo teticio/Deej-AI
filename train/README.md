@@ -88,7 +88,7 @@ The MP3ToVec model can be converted from PyTorch to TensorFlow with
 python train/pt_to_tf.py
 ```
 
-The `spotifytovec.p`, `tracktovec.p`, `spotify_tracks.p`, `spotify_urls.p` and `speccy_model` files are installed to the directory where `deej-ai.online` is running with the following command. This also ensures that there are the same tracks in all the files.
+The `spotifytovec.p`, `tracktovec.p`, `spotify_tracks.p`, `spotify_urls.p` and `speccy_model` files are installed to the directory where [`deej-ai.online`](https://github.com/teticio/deej-ai.online-app) is running with the following command. This also ensures that there are the same tracks in all the files.
 ```bash
 python train/install_model.py
 ```
