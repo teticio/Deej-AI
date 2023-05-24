@@ -2,11 +2,11 @@
 
 Since I last trained Deej-A.I. nearly 5 years ago, a lot of things have changed. For one thing, there is a lot of new music not included in the model, but also my Python programming has improved, I now have my own server with GPUs (as opposed to being limited to Google Colab) and I have learned ways to improve upon what I did originally. Even so, people still continue to use the website, so I think it is time to train a new model.
 
+## Setup
+
 The first step is to produce a dataset of Spotify user playlists. Previously I did this by searching for all plalists containg 'a', 'b' and so on, but a better (but less legitamate) way is to first create a list of Spotify user IDs and then get all their public playlists.
 
 Use the inspector in your browser to get the `sp_dc` cookie from the web player when you are logged in to Spotify. Then run the following script to get at least 1,000,000 Spotify user IDs. It does this by crawling the followers of the seed user, who they are following and their followers and so on. Unfortunately, there is no way to do this via the regular Spotify API.
-
-## Setup
 
 ```bash
 pip install -r train/requirements.txt
