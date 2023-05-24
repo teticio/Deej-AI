@@ -14,6 +14,7 @@ from tqdm import tqdm
 from utils import (get_access_token, paginate, read_playlists, read_tracks,
                    request_with_proxy, write_playlists, write_tracks)
 
+MARKET = "GB"
 access_token = None
 
 
@@ -23,7 +24,7 @@ def get_playlist_items(playlist_id, limit=50, offset=0, proxy=None):
         try:
             if access_token is None:
                 access_token = get_access_token(proxy=proxy)
-            url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks?limit={limit}&offset={offset}"
+            url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks?limit={limit}&offset={offset}&market={MARKET}"
             headers = {
                 "Authorization": f"Bearer {access_token}",
                 "Content-Type": "application/json",
@@ -58,7 +59,7 @@ def main():
     parser.add_argument(
         "--max_workers",
         type=int,
-        default=1,
+        default=32,
         help="Maximum number of cores to use",
     )
     parser.add_argument(
