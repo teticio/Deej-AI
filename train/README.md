@@ -6,6 +6,18 @@ The first step is to produce a dataset of Spotify user playlists. Previously I d
 
 Use the inspector in your browser to get the `sp_dc` cookie from the web player when you are logged in to Spotify. Then run the following script to get at least 1,000,000 Spotify user IDs. It does this by crawling the followers of the seed user, who they are following and their followers and so on. Unfortunately, there is no way to do this via the regular Spotify API.
 
+## Setup
+
+```bash
+pip install -r train/requirements.txt
+mkdir data
+mkdir models
+mkdir previews
+mkdir spectrograms
+```
+
+## Get data
+
 ```bash
 python train/get_users.py --cookie=... --user=<seed_user> --limit=1000000
 ```
@@ -41,6 +53,8 @@ Use this script to find particular tracks (useful for model evaluation - see `co
 python train/search_tracks.py --search="James Brown"
 ```
 
+## Train models
+
 Now you can train a Track2Vec model with
 ```bash
 python train/track2vec.py
@@ -66,6 +80,8 @@ To reduce these to a single vector per track using the TF-IDF algorithm, run
 ```bash
 python train/calc_tfidf.py
 ```
+
+## Install models
 
 The MP3ToVec model can be converted from PyTorch to TensorFlow with
 ```bash
