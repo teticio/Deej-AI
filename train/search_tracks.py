@@ -11,7 +11,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--search",
         type=str,
-        required=True,
+        default=None,
         help="Search string",
     )
     parser.add_argument(
@@ -29,4 +29,9 @@ if __name__ == "__main__":
         names=["artist", "title", "url", "count"],
     ).fillna("")
     tracks_df["name"] = tracks_df["artist"] + " - " + tracks_df["title"]
-    print(tracks_df[tracks_df["name"].str.contains(args.search, case=False)][["name"]])
+
+    interactive = args.search is None
+    while interactive:
+        if interactive:
+            args.search = input("Search: ")
+        print(tracks_df[tracks_df["name"].str.contains(args.search, case=False)][["name"]])
