@@ -5,7 +5,7 @@ mel:
   hop_length: 512
 
 data:
-  batch_size: 32
+  batch_size: 1024
   test_track_ids:
   - "3EYOJ48Et32uATr9ZmLnAo"  # The Police - Roxanne
   - "3Ti0GdlrotgwsAVBBugv0I"  # A Tribe Called Quest - Can I Kick It?
