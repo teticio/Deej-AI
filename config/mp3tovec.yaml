@@ -25,6 +25,6 @@ data:
   - "2eIk5ky8THuVeQg5Z5eVav"  # Andy Williams - Can't Take My Eyes Off You
 
 trainer:
-  max_epochs: 100
+  max_epochs: 500
   accelerator: gpu
   devices: auto
