@@ -79,11 +79,15 @@ def train_val_split(dataset, train_frac=0.8):
     return random_split(dataset, [train_size, val_size])
 
 
-def create_dataloaders(directory, track2vec, batch_size=32):
+def create_dataloaders(directory, track2vec, batch_size=32, num_workers=1):
     dataset = Mp3Dataset(directory, track2vec)
     train_dataset, val_dataset = train_val_split(dataset)
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
+    train_loader = DataLoader(
+        train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers
+    )
+    val_loader = DataLoader(
+        val_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers
+    )
     return train_loader, val_loader
 
 
@@ -155,7 +159,10 @@ if __name__ == "__main__":
     track2vec = pickle.load(open(f"{args.track2vec_model_file}.p", "rb"))
 
     train_loader, val_loader = create_dataloaders(
-        args.spectrograms_dir, track2vec, batch_size=config["data"]["batch_size"]
+        args.spectrograms_dir,
+        track2vec,
+        batch_size=config["data"]["batch_size"],
+        num_workers=config["data"]["num_workers"],
     )
 
     track2vec_model = gensim.models.Word2Vec.load(args.track2vec_model_file)
