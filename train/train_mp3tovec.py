@@ -9,6 +9,7 @@ import torch
 import yaml
 from audiodiffusion.audio_encoder import AudioEncoder
 from lightning.pytorch.callbacks import Callback, ModelCheckpoint
+from lightning.pytorch.utilities.rank_zero import rank_zero_only
 from PIL import Image
 from torch import nn
 from torch.utils.data import DataLoader, Dataset, random_split
@@ -98,6 +99,7 @@ class TestCallback(Callback):
         self.test_track_ids = test_track_ids
         self.test_batch = test_batch
 
+    @rank_zero_only
     def on_train_epoch_end(self, trainer, pl_module):
         pl_module.eval()
         with torch.no_grad():
