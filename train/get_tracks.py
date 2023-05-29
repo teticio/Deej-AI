@@ -8,17 +8,39 @@ import json
 import os
 import traceback
 from time import sleep
+from typing import Dict, Optional
 
 import requests
 from tqdm import tqdm
-from utils import (get_access_token, paginate, read_playlists, read_tracks,
-                   request_with_proxy, write_playlists, write_tracks)
+from utils import (
+    get_access_token,
+    paginate,
+    read_playlists,
+    read_tracks,
+    request_with_proxy,
+    write_playlists,
+    write_tracks,
+)
 
-MARKET = "GB"
+MARKET = "GB"  # UK
 access_token = None
 
 
-def get_playlist_items(playlist_id, limit=50, offset=0, proxy=None):
+def get_playlist_items(
+    playlist_id: str, limit: int = 50, offset: int = 0, proxy: Optional[str] = None
+) -> Dict:
+    """
+    Retrieves the items (tracks) in a Spotify playlist and associated information.
+
+    Args:
+        playlist_id (str): The ID of the playlist to retrieve items for.
+        limit (int): The maximum number of items to retrieve. Default is 50.
+        offset (int): The offset to start retrieving items from. Default is 0.
+        proxy (str): The name of the proxy Lambda function to use for the request (see README). Default is None.
+
+    Returns:
+        A dictionary containing the items in the playlist and associated information.
+    """
     global access_token
     for _ in range(0, 2):
         try:
@@ -48,7 +70,22 @@ def get_playlist_items(playlist_id, limit=50, offset=0, proxy=None):
     return {}
 
 
-def main():
+def main() -> None:
+    """
+    Entry point for the get_tracks script.
+
+    Retrieves tracks for a list of Spotify playlists.
+
+    Args:
+        --batch_size (int): The number of tracks to retrieve per batch. Default is 10000.
+        --max_workers (int): The maximum number of cores to use. Default is 32.
+        --playlists_file (str): Path to the input playlist CSV file. Default is "data/playlists.csv".
+        --playlist_details_file (str): Path to the output playlist details CSV file. Default is "data/playlists.csv".
+        --tracks_file (str): Path to the output CSV file to save track information. Default is "data/tracks.csv".
+
+    Returns:
+        None
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--batch_size",
@@ -67,6 +104,12 @@ def main():
         type=str,
         default="data/playlists.csv",
         help="Playlists CSV file",
+    )
+    parser.add_argument(
+        "--playlist_details_file",
+        type=str,
+        default="data/playlist_details.csv",
+        help="Playlist details CSV file",
     )
     parser.add_argument(
         "--proxy",

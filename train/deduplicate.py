@@ -10,6 +10,23 @@ csv.field_size_limit(1000000)
 
 
 if __name__ == "__main__":
+    """
+    Entry point for the deduplicate script.
+
+    Deduplicates playlists and tracks.
+
+    Args:
+        --dedup_playlists_file (str): Path to save the deduplicated playlists CSV file. Default is "data/playlists_dedup.csv".
+        --dedup_tracks_file (str): Path to save the deduplicated tracks CSV file. Default is "data/tracks_dedup.csv".
+        --drop_missing_urls (bool): Whether to drop tracks with missing URLs. Default is True.
+        --min_count (int): Number of times a track must appear in playlists to be included. Default is 10.
+        --oov (str): ID for out-of-vocabulary track or None to skip. Default is None.
+        --playlists_file (str): Path to the playlists CSV file. Default is "data/playlist_details.csv".
+        --tracks_file (str): Path to the tracks CSV file. Default is "data/tracks.csv".
+
+    Returns:
+        None
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--dedup_playlists_file",
@@ -44,7 +61,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--playlists_file",
         type=str,
-        default="data/playlists.csv",
+        default="data/playlist_details.csv",
         help="Playlists CSV file",
     )
     parser.add_argument(

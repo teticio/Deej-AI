@@ -10,6 +10,18 @@ pd.set_option("display.max_rows", 1000)
 
 
 if __name__ == "__main__":
+    """
+    Entry point for the test_track2vec script.
+
+    Test the Track2Vec model.
+
+    Args:
+        --dedup_tracks_file (str): Path to the deduplicated tracks CSV file. Default is "data/tracks_dedup.csv".
+        --model_file (str): Path to the Track2Vec model file (without extension). Default is "models/track2vec".
+
+    Returns:
+        None
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--dedup_tracks_file",
@@ -21,7 +33,7 @@ if __name__ == "__main__":
         "--model_file",
         type=str,
         default="models/track2vec",
-        help="Model file",
+        help="Track2Vec model file (without extension)",
     )
     args = parser.parse_args()
 
@@ -47,7 +59,7 @@ if __name__ == "__main__":
 
     print(
         f"\u001b]8;;{tracks_df.loc[track_id]['url']}\u001b\\{tracks_df.loc[track_id]['artist']} - {tracks_df.loc[track_id]['title']}\u001b]8;;\u001b\\"
-    )
+    )  # type: ignore
     most_similar = model.wv.most_similar(positive=[track_id], topn=8)
     for i, similar in enumerate(most_similar):
         print(

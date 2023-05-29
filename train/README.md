@@ -2,7 +2,22 @@
 
 Since I last trained Deej-A.I. nearly 5 years ago, a lot of things have changed. For one thing, there is a lot of new music not included in the model, but also my Python programming has improved, I now have my own server with GPUs (as opposed to being limited to Google Colab) and I have learned ways to improve upon what I did originally. Even so, people still continue to use the website, so I think it is time to train a new model.
 
-You can run `make help` from the project root directory and run the following steps with `make <step>`.
+You can run `make help` from the project root directory. If you run
+
+```bash
+make install COOKIE=... USER=... MAX_WORKERS=1 PROXY=
+```
+
+then by default it will make all the steps below necessary to create the datasets, train the models and install them to the `../deej-ai.online-dev/model`. You will need to specify the `sp_dc` cookie and Spotify user to start from (see below). You will also need to ensure taht the `test_track_ids` in the `config/track2vec.yaml` and `config/mp3tovec.yaml` files are present by searching in the `data/tracks_dedup.csv` file. The workflow would typically be
+
+```bash
+# Create datasets
+make tracks COOKIE=... USER=... MAX_WORKERS=1 PROXY=
+make search
+make install
+```
+
+If you want to use more than one worker, you will need to set up proxy Lambda functions to avoid throttling issues with the Spotify API as described below. More detailed descriptions of the scripts follow.
 
 ## Setup
 

@@ -7,6 +7,18 @@ pd.set_option("display.max_rows", 1000)
 
 
 if __name__ == "__main__":
+    """
+    Entry point for the search_tracks script.
+
+    Searches for tracks on Spotify.
+
+    Args:
+        --search (str): Search string. Default is None (interactive mode).
+        --tracks_file (str): Path to the tracks CSV file. Default is "data/tracks_dedup.csv".
+
+    Returns:
+        None
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--search",
@@ -34,4 +46,6 @@ if __name__ == "__main__":
     while interactive:
         if interactive:
             args.search = input("Search: ")
-        print(tracks_df[tracks_df["name"].str.contains(args.search, case=False)][["name"]])
+        print(
+            tracks_df[tracks_df["name"].str.contains(args.search, case=False)][["name"]]
+        )

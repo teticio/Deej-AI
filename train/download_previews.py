@@ -8,7 +8,18 @@ import requests
 from tqdm import tqdm
 
 
-def download_file(track_id, track_url, dir):
+def download_file(track_id: str, track_url: str, dir: str) -> None:
+    """
+    Downloads an MP3 preview file from a URL and saves it to disk.
+
+    Args:
+        track_id (str): The ID of the track to download.
+        track_url (str): The URL of the MP3 preview file to download.
+        dir (str): The directory to save the downloaded file.
+
+    Returns:
+        None
+    """
     for _ in range(0, 2):
         response = requests.get(track_url, stream=True)
         if response.status_code == 200:
@@ -18,7 +29,20 @@ def download_file(track_id, track_url, dir):
     print(f"Skipping {track_url}")
 
 
-def main():
+def main() -> None:
+    """
+    Entry point for the download_previews script.
+
+    Downloads MP3 preview files for a list of tracks.
+
+    Args:
+        --max_workers (int): Maximum number of cores to use. Default is the number of available CPU cores on the system,
+        --previews_dir (str): Path to the directory where preview files will be saved. Default is "previews".
+        --tracks_file (str): Path to the CSV file containing the list of tracks to download. Default is "data/tracks_dedup.csv".
+
+    Returns:
+        None
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--max_workers",

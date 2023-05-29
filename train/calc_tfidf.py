@@ -3,12 +3,26 @@ import concurrent.futures
 import os
 import pickle
 from time import sleep
+from typing import Dict, List
 
 import numpy as np
 from tqdm import tqdm
 
 
-def calc_idf(mp3s, mp3_indices, close):
+def calc_idf(
+    mp3s: List[str], mp3_indices: Dict[str, List], close: np.ndarray
+) -> np.ndarray:
+    """
+    Calculates the inverse document frequency (IDF) for a list of MP3 files.
+
+    Args:
+        mp3s (list[str]): A list of MP3 IDs.
+        mp3_indices (dict[str, List]): A map of MP3 IDs to a list of indices in the list of vectors.
+        close (np.ndarray): close[i, j] = True if cosine proximity of the ith and jth vectors is less than epsilon.
+
+    Returns:
+        np.ndarray: IDF[i] = 1 / log of number of MP3s in which ith vector appears at least once.
+    """
     vec_in_mp3 = np.zeros((close.shape[0], len(mp3s)))
     for i, mp3 in enumerate(mp3s):
         vec_in_mp3[:, i] = close[:, mp3_indices[mp3]].any(axis=1)
@@ -16,7 +30,26 @@ def calc_idf(mp3s, mp3_indices, close):
     return idfs
 
 
-def calc_tf_and_mp3tovec(mp3s, mp3_indices, close, idfs, mp3_vecs):
+def calc_tf_and_mp3tovec(
+    mp3s: List[str],
+    mp3_indices: Dict[str, List],
+    close: np.ndarray,
+    idfs: np.ndarray,
+    mp3_vecs: np.ndarray,
+) -> Dict[str, np.ndarray]:
+    """
+    Calculates the term frequency (TF) and TF-IDF vectors for a list of MP3 files.
+
+    Args:
+        mp3s (List[str]): A list of MP3 IDs.
+        mp3_indices (dict[str, List]): A map of MP3 IDs to a list of indices in the list of vectors.
+        close (np.ndarray): close[i, j] = True if cosine proximity of the ith and jth vectors is less than epsilon.
+        idfs (np.ndarray): 1 / log of number of MP3s in which ith vector appears at least once.
+        mp3_vecs (np.ndarray): A list of all MP3 vectors.
+
+    Returns:
+        Dict[str, np.ndarray]: A map of MP3 IDs to a single MP3ToVec vector using TF-IDF.
+    """
     mp3tovec = {}
     for mp3 in mp3s:
         tf = np.sum(close[mp3_indices[mp3], :][:, mp3_indices[mp3]], axis=1)
@@ -29,7 +62,21 @@ def calc_tf_and_mp3tovec(mp3s, mp3_indices, close, idfs, mp3_vecs):
     return mp3tovec
 
 
-def calc_mp3tovec(mp3s, mp3tovecs, epsilon, dims):
+def calc_mp3tovec(
+    mp3s: List[str], mp3tovecs: Dict[str, np.ndarray], epsilon: float, dims: int
+) -> Dict[str, np.ndarray]:
+    """
+    Calculates the feature vectors for a list of MP3 files.
+
+    Args:
+        mp3s (List[str]): A list of MP3 IDs.
+        mp3tovecs (Dict[str, np.ndarray]): A map of MP3 IDs to an array of MP3ToVec vectors.
+        epsilon (float): A small value used to determine whether two vectors are the close in cosine proximity.
+        dims (int): The number of dimensions of the MP3ToVec vectors.
+
+    Returns:
+        Dict[str, np.ndarray]: A map of MP3 IDs to a single MP3ToVec vector using TF-IDF.
+    """
     mp3tovec = {}
     mp3_indices = {}
     mp3_vecs = np.empty((sum(len(mp3tovecs[mp3]) for mp3 in mp3s), dims))
@@ -59,7 +106,20 @@ def calc_mp3tovec(mp3s, mp3tovecs, epsilon, dims):
     return mp3tovec
 
 
-def main():
+def main() -> None:
+    """
+    Main function for the calc_tfidf script.
+
+    Calculates single MP3ToVec vector from a list of MP3ToVec vectors per MP3 using TF-IDF.
+
+    Args:
+        --batch_size (int): Batch size for TF-IDF calculation. Default is 100.
+        --epsilon (float): Minimum cosine proximity for two vectors to be considered equal. Default is 0.001.
+        --max_workers (int): Maximum number of cores to use. Default is the number of cores on the machine.
+
+    Returns:
+        None
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--batch_size",

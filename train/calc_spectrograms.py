@@ -8,13 +8,33 @@ from audiodiffusion.mel import Mel
 from tqdm import tqdm
 
 
-def calc_spectrogram(mp3_file, previews_dir, spectrograms_dir, mel):
+def calc_spectrogram(mp3_file: str, previews_dir: str, spectrograms_dir: str, mel: Mel):
+    """
+    Calculates the spectrogram of the first slice of an MP3 file and saves it to disk.
+
+    Args:
+        mp3_file (str): Filename of MP3.
+        previews_dir (str): Directory of MP3.
+        spectrograms_dir (str): Path to the directory where spectrogram images will be saved.
+        mel (Mel): Mel object.
+    """
     mel.load_audio(os.path.join(previews_dir, mp3_file))
-    image = mel.audio_slice_to_image(slice=0, ref=mel.n_fft // 2)
+    image = mel.audio_slice_to_image(slice=0, ref=float(mel.n_fft // 2))
     image.save(os.path.join(spectrograms_dir, mp3_file[: -len(".mp3")] + ".png"))
 
 
-if __name__ == "__main__":
+def main():
+    """
+    Main function for the calc_spectrograms script.
+
+    Calculates spectrograms for a directory of MP3 files.
+
+    Args:
+        --config_file (str): Path to the model configuration file. Default is "config/mp3tovec.yaml".
+        --max_workers (int): Maximum number of cores to use. Default is the number of available CPU cores on the system.
+        --previews_dir (str): Path to the directory where preview MP3s will be read from. Default is "previews".
+        --spectrograms_dir (str): Path to the directory where spectrogram images will be saved. Default is "spectrograms".
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--config_file",
@@ -78,3 +98,7 @@ if __name__ == "__main__":
                 break
             except Exception:
                 print(f"Skipping {mp3_file}")
+
+
+if __name__ == "__main__":
+    main()

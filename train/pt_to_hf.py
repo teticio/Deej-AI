@@ -6,9 +6,23 @@ os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
 import torch
 from audiodiffusion.audio_encoder import AudioEncoder
-from huggingface_hub import HfFolder, Repository, whoami
+from huggingface_hub import Repository
 
 if __name__ == "__main__":
+    """
+    Entry point for the pt_to_hf script.
+
+    Converts a PyTorch MP3ToVec model to a Hugging Face MP3ToVec model.
+
+    Args:
+        --mp3tovec_model_file (str): Path to the MP3ToVec model file. Default is "models/mp3tovec.ckpt".
+        --hub_model_id (str): Hugging Face model ID. Default is "teticio/audio-encoder".
+        --output_dir (str): Hugging Face model path. Default is "models/audio-encoder".
+        --push_to_hub (bool): Push to Hugging Face hub. Default is False.
+
+    Returns:
+        None
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--mp3tovec_model_file",
@@ -51,4 +65,4 @@ if __name__ == "__main__":
         repo = Repository(args.output_dir, clone_from=args.hub_model_id)
     audio_encoder.save_pretrained(args.output_dir)
     if args.push_to_hub:
-        repo.push_to_hub(whoami())
+        repo.push_to_hub()  # type: ignore

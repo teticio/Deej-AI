@@ -1,6 +1,7 @@
 import argparse
 import os
 from collections import OrderedDict
+from typing import Optional
 
 os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
@@ -12,6 +13,18 @@ from keras.models import load_model
 from torch import Tensor
 
 if __name__ == "__main__":
+    """
+    Entry point for the tf_to_pt script.
+
+    Converts a TensorFlow MP3ToVec model to a PyTorch MP3ToVec model.
+
+    Args:
+        --pt_model_file (str): Path to the PyTorch model file. Default is "models/mp3tovec.ckpt".
+        --tf_model_file (str): Path to the TensorFlow model file. Default is "models/speccymodel".
+
+    Returns:
+        None
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--pt_model_file",
@@ -27,10 +40,12 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    model = load_model(
+    model: Optional[tf.keras.Model] = load_model(
         args.tf_model_file,
         custom_objects={"cosine_proximity": tf.compat.v1.keras.losses.cosine_proximity},
     )
+    if model is None:
+        raise ValueError("Model did not load correctly.")
 
     pytorch_model = AudioEncoder()
     new_state_dict = OrderedDict()
@@ -64,16 +79,16 @@ if __name__ == "__main__":
         )
 
     new_state_dict[f"dense_block.batch_norm.weight"] = Tensor(
-        model.get_layer(f"batch_normalization_{conv_block + 2}").gamma.numpy()
+        model.get_layer(f"batch_normalization_{conv_block + 2}").gamma.numpy()  # type: ignore
     )
     new_state_dict[f"dense_block.batch_norm.running_mean"] = Tensor(
-        model.get_layer(f"batch_normalization_{conv_block + 2}").moving_mean.numpy()
+        model.get_layer(f"batch_normalization_{conv_block + 2}").moving_mean.numpy()  # type: ignore
     )
     new_state_dict[f"dense_block.batch_norm.running_var"] = Tensor(
-        model.get_layer(f"batch_normalization_{conv_block + 2}").moving_variance.numpy()
+        model.get_layer(f"batch_normalization_{conv_block + 2}").moving_variance.numpy()  # type: ignore
     )
     new_state_dict[f"dense_block.batch_norm.bias"] = Tensor(
-        model.get_layer(f"batch_normalization_{conv_block + 2}").beta.numpy()
+        model.get_layer(f"batch_normalization_{conv_block + 2}").beta.numpy()  # type: ignore
     )
 
     new_state_dict[f"dense_block.dense.weight"] = Tensor(

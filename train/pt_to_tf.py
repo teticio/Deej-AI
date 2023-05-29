@@ -4,16 +4,35 @@ import os
 os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
 import numpy as np
-import tensorflow as tf
 import torch
 from audiodiffusion.audio_encoder import AudioEncoder
-from tensorflow.compat.v1.keras.losses import cosine_proximity
-from tensorflow.keras.layers import (BatchNormalization, Dense, Dropout,
-                                     Flatten, Input, LeakyReLU, MaxPooling2D,
-                                     SeparableConv2D)
-from tensorflow.keras.models import Sequential
+from keras.models import load_model, save_model
+from tensorflow.compat.v1.keras.losses import cosine_proximity  # type: ignore
+from tensorflow.keras.layers import Dropout  # type: ignore
+from tensorflow.keras.layers import (  # type: ignore
+    BatchNormalization,
+    Dense,
+    Flatten,
+    Input,
+    LeakyReLU,
+    MaxPooling2D,
+    SeparableConv2D,
+)
+from tensorflow.keras.models import Sequential  # type: ignore
 
 if __name__ == "__main__":
+    """
+    Entry point for the pt_to_tf script.
+
+    Converts a PyTorch MP3ToVec model to a TensorFlow MP3ToVec model.
+
+    Args:
+        --pt_model_file (str): Path to the PyTorch model file. Default is "models/mp3tovec.ckpt".
+        --tf_model_file (str): Path to the TensorFlow model file. Default is "models/speccymodel".
+
+    Returns:
+        None
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--pt_model_file",
@@ -24,7 +43,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--tf_model_file",
         type=str,
-        default="models/speccymodel",
+        default="models/speccy_model",
         help="TensorFlow model path",
     )
     args = parser.parse_args()
@@ -133,7 +152,7 @@ if __name__ == "__main__":
             ]
         )
 
-    model.get_layer(name=f"batch_normalization_{conv_block+2}").set_weights(
+    model.get_layer(name=f"batch_normalization_{conv_block+2}").set_weights(  # type: ignore
         [
             pytorch_model.state_dict()[f"dense_block.batch_norm.weight"]
             .float()
@@ -167,7 +186,10 @@ if __name__ == "__main__":
     )
 
     model.compile(loss=cosine_proximity, optimizer="adam")
-    model.save_weights(args.tf_model_file, save_format="h5")
+    save_model(model=model, filepath=args.tf_model_file, save_format="h5")
+    model = load_model(args.tf_model_file)
+    if model is None:
+        raise ValueError("Failed to load model")
 
     # test
     np.random.seed(42)

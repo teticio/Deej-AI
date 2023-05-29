@@ -4,17 +4,41 @@ import multiprocessing as mp
 import os
 import pickle
 from time import sleep
+from typing import List
 
+import numpy as np
 import torch
 from audiodiffusion.audio_encoder import AudioEncoder
 from tqdm import tqdm
 
 
-def encode_file(model, mp3_file, dir):
+def encode_file(model, mp3_file, dir) -> List[np.ndarray]:
+    """
+    Encode MP3 file as list of MP3ToVecs.
+
+    Args:
+        model (torch.nn.Module): MP3Tovec model.
+        mp3_file (str): Filename of MP3.
+        dir (str): Directory of MP3 files.
+
+    Returns:
+        List[np.ndarray]: List of MP3ToVec vectors
+    """
     return model.encode([os.path.join(dir, mp3_file)], pool=None)[0].cpu().numpy()
 
 
 def main():
+    """
+    Main function for the calc_mp3tovecs script.
+
+    Encodes a directory of MP3 files as a dictionary of lists of MP3ToVec vectors
+
+    Ags:
+        --max_workers (int): Maximum number of cores to use. Default is the number of cores on the machine.
+        --mp3tovec_model_file (str): Path to the MP3ToVec model file. Default is "models/mp3tovec.ckpt".
+        --mp3tovecs_file (str): Path to the output file where the MP3ToVec vectors will be saved. Default is "models/mp3tovecs.p".
+        --mp3s_dir (str): Path to the directory containing the MP3 files to be encoded. Default is "previews".
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--max_workers",

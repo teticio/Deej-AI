@@ -6,6 +6,21 @@ import shutil
 from utils import read_tracks
 
 if __name__ == "__main__":
+    """
+    Entry point for the install_model script.
+
+    Installs model to deej-ai.online app.
+
+    Args:
+        --deejai_model_dir (str): Path to the deej-ai.online model directory. Default is "../deej-ai.online-dev/model".
+        --mp3tovec_model_file (str): Path to the MP3ToVec model file. Default is "models/mp3tovec.ckpt".
+        --mp3tovec_file (str): Path to the MP3ToVec file. Default is "models/mp3tovec.p".
+        --track2vec_file (str): Path to the Track2Vec file. Default is "models/track2vec.p".
+        --tracks_file (str): Path to the tracks CSV file. Default is "data/tracks.csv".
+
+    Returns:
+        None
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--deejai_model_dir",
@@ -40,7 +55,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     track2vec = pickle.load(open(f"{args.track2vec_file}", "rb"))
-    spotify2vec = pickle.load(open(f"{args.spotify2vec_file}", "rb"))
+    spotify2vec = pickle.load(open(f"{args.mp3tovec_file}", "rb"))
     tracks = read_tracks(args.tracks_file)
 
     common_tracks = set(track2vec.keys()).intersection(set(spotify2vec.keys()))

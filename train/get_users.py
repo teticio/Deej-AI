@@ -1,12 +1,34 @@
 import argparse
+from typing import Set
 
 import pandas as pd
 import requests
 from utils import get_access_token
 
 
-def get_following_and_followers(user, cookie):
-    def add_users(users, response_json):
+def get_following_and_followers(user: str, cookie: str) -> Set[str]:
+    """
+    Retrieves the list of users that a given user is following or followed by.
+
+    Args:
+        user (str): The username of the user to retrieve following and followers for.
+        cookie (str): The cookie string to use for authentication.
+
+    Returns:
+        A set containing the usernames of the users that the given user is following or followed by.
+    """
+
+    def add_users(users: Set[str], response_json: dict) -> None:
+        """
+        Adds the usernames of Spotify users to a set.
+
+        Args:
+            users (set): The set to add the usernames to.
+            response_json (dict): The JSON response from a Spotify API request.
+
+        Returns:
+            None
+        """
         if "profiles" in response_json:
             for profile in response_json["profiles"]:
                 if profile["uri"].startswith("spotify:user:"):
@@ -32,6 +54,20 @@ def get_following_and_followers(user, cookie):
 
 
 if __name__ == "__main__":
+    """
+    Entry point for the get_users script.
+
+    Retrieves Spotify users.
+
+    Args:
+        --cookie (str): The sp_dc cookie to use for authentication.
+        --limit (int): The maximum number of users to retrieve. Default is None (CTRL+C to stop).
+        --user (str): The username of the user to start from.
+        --users_file (str): The path to the CSV file to write the users to. Default is data/users.csv.
+
+    Returns:
+        None
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument("--cookie", type=str, required=True, help="sp_dc cookie")
     parser.add_argument("--limit", type=int, default=None, help="Limit number of users")

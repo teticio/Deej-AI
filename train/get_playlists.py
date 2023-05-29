@@ -8,6 +8,20 @@ from tqdm import tqdm
 from utils import get_access_token, paginate
 
 if __name__ == "__main__":
+    """
+    Entry point for the get_playlists script.
+
+    Parses command-line arguments and retrieves playlists for a list of Spotify users.
+
+    Args:
+        --limit (int): Limit number of playlists to retrieve. Default is None (retrieve all playlists).
+        --playlists_file (str): Path to the output CSV file where playlists will be saved. Default is "data/playlists.csv".
+        --start_from (int): Index of the first user from which to retrieve playlists for. Default is 0.
+        --users_file (str): Path to the user IDs CSV file to retrieve playlists for. Default is "data/users.csv".
+
+    Returns:
+        None
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--limit", type=int, default=None, help="Limit number of playlists"

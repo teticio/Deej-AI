@@ -13,7 +13,15 @@ csv.field_size_limit(1000000)
 
 
 class Logger(CallbackAny2Vec):
-    def __init__(self, config, args):
+    """
+    Callback to log most similar tracks to test tracks during training.
+
+    Args:
+        config (dict): Config dictionary
+        args (argparse.Namespace): Command-line arguments
+    """
+
+    def __init__(self, config: dict, args: argparse.Namespace) -> None:
         self.config = config
         self.args = args
         self.epoch = 0
@@ -29,7 +37,16 @@ class Logger(CallbackAny2Vec):
             .to_dict(orient="index")
         )
 
-    def on_epoch_end(self, model):
+    def on_epoch_end(self, model: gensim.models.Word2Vec) -> None:
+        """
+        Log most similar tracks to test tracks at the end of each epoch.
+
+        Args:
+            model (gensim.models.Word2Vec): The Track2Vec model
+
+        Returns:
+            None
+        """
         self.epoch += 1
         print(
             f"Epoch {self.epoch} loss = {(model.get_latest_training_loss() - self.loss) / self.config['model']['batch_words']}"
@@ -41,7 +58,7 @@ class Logger(CallbackAny2Vec):
         for track_id in self.config["data"]["test_track_ids"]:
             print(
                 f"\u001b]8;;{self.tracks[track_id]['url']}\u001b\\{self.tracks[track_id]['artist']} - {self.tracks[track_id]['title']}\u001b]8;;\u001b\\"
-            )
+            )  # type: ignore
             most_similar = model.wv.most_similar(positive=[track_id], topn=8)
             for i, similar in enumerate(most_similar):
                 print(
@@ -51,6 +68,21 @@ class Logger(CallbackAny2Vec):
 
 
 if __name__ == "__main__":
+    """
+    Entry point for the train_track2vec script.
+
+    Trains the Track2Vec model.
+
+    Args:
+        --config_file (str): Path to the model configuation file. Default is "config/track2vec.yaml".
+        --playlists_file (str): Path to the deduplicated playlists CSV file. Default is "data/playlists_dedup.csv".
+        --tracks_file (str): Path to the deduplicated tracks CSV file. Default is "data/tracks_dedup.csv".
+        --max_workers (int): Maximum number of cores to use. Default is the number of cores on the machine.
+        --model_file (str): Path to the model save file without extension. Default is "models/track2vec".
+
+    Returns:
+        None
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--config_file",
@@ -77,7 +109,7 @@ if __name__ == "__main__":
         help="Maximum number of cores to use",
     )
     parser.add_argument(
-        "--model_file",
+        "--track2vec_model_file",
         type=str,
         default="models/track2vec",
         help="Model save file without extension",
