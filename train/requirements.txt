@@ -1,0 +1,11 @@
+audiodiffusion
+boto3
+gensim
+huggingface-hub
+pandas
+lightning
+pyyaml
+requests
+spotipy
+tensorflow==2.9.1
+tqdm

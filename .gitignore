@@ -30,4 +30,10 @@ speccy_model
 spotify_tracks.p
 spotifytovec.p
 tracktovec.p
-audio-encoder
+.cache*
+__pycache__
+models
+data
+previews
+spectrograms
+lightning_logs
