@@ -57,7 +57,7 @@ $(PREVIEWS_DIR)/: $(DATA_DIR)/tracks_dedup.csv
 
 .PHONY: spectrograms
 spectrograms: $(SPECTROGRAMS_DIR)/ ## Generate spectrograms for first audio slice of each preview
-$(SPECTROGRAMS_DIR)/: $(PREVIEWS_DIR)
+$(SPECTROGRAMS_DIR)/: $(PREVIEWS_DIR)/
 	@mkdir -p $(SPECTROGRAMS_DIR)
 	@touch $(SPECTROGRAMS_DIR)
 	python train/calc_spectrograms.py --max_workers=$(MAX_WORKERS) --previews_dir=$(PREVIEWS_DIR) --spectrograms_dir=$(SPECTROGRAMS_DIR)
