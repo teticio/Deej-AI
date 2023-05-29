@@ -21,12 +21,12 @@ setup: ## Setup environment for training
 users: $(DATA_DIR)/users.csv ## Scrape user IDs from Spotify
 $(DATA_DIR)/users.csv:
 	@mkdir -p $(DATA_DIR)
-	python train/get_users.py --cookie=$(COOKIE) --user=$(USER) --limit=$(LIMIT_USERS) --users_file=$(USERS_FILE)/users.csv
+	python train/get_users.py --cookie=$(COOKIE) --user=$(USER) --limit=$(LIMIT_USERS) --users_file=$(DATA_DIR)/users.csv
 
 .PHONY: playlists
 playlists: ## Get user playlist IDs from Spotify
 $(DATA_DIR)/playlist_details.csv: $(DATA_DIR)/users.csv
-	python train/get_playlists.py --limit=$(LIMIT_PLAYLISTS) --users_file=$(USERS_FILE)/users.csv --playlists_file=$(DATA_DIR)/playlists.csv --playlist_details_file==$(DATA_DIR)/playlist_details.csv
+	python train/get_playlists.py --limit=$(LIMIT_PLAYLISTS) --users_file=$(DATA_DIR)/users.csv --playlists_file=$(DATA_DIR)/playlists.csv --playlist_details_file==$(DATA_DIR)/playlist_details.csv
 
 .PHONY: tracks
 tracks: $(DATA_DIR)/tracks.csv ## Get playlist track IDs from Spotify
