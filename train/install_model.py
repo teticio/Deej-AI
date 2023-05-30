@@ -32,7 +32,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--mp3tovec_model_file",
         type=str,
-        default="models/mp3tovec.ckpt",
+        default="models/speccy_model",
         help="MP3ToVec model file",
     )
     parser.add_argument(
