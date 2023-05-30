@@ -182,7 +182,7 @@ def main() -> None:
                 del items
 
         write_tracks(tracks, args.tracks_file)
-        write_playlists(playlists, args.playlists_file)
+        write_playlists(playlists, args.playlist_details_file)
         gc.collect()
 
 

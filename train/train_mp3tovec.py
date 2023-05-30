@@ -186,6 +186,8 @@ class TestCallback(Callback):
             trainer (pytorch_lightning.Trainer): The PyTorch Lightning trainer.
             pl_module (pytorch_lightning.LightningModule): The PyTorch Lightning module.
         """
+        if self.test_batch.shape[0] == 0:
+            return
         pl_module.eval()
         with torch.no_grad():
             vecs = pl_module(self.test_batch.to(pl_module.device))
@@ -275,7 +277,7 @@ if __name__ == "__main__":
             image_to_tensor(os.path.join(args.spectrograms_dir, f"{test_track_id}.png"))
             for test_track_id in test_track_ids
         ]
-    )
+    ) if len(test_track_ids) > 0 else torch.Tensor()
     test_callback = TestCallback(tracks, track2vec_model, test_track_ids, test_batch)
     checkpoint_callback = ModelCheckpoint(
         save_top_k=1,

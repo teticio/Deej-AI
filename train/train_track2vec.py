@@ -52,9 +52,9 @@ class Logger(CallbackAny2Vec):
             f"Epoch {self.epoch} loss = {(model.get_latest_training_loss() - self.loss) / self.config['model']['batch_words']}"
         )
         self.loss = model.get_latest_training_loss()
-        model.save(self.args.model_file)
+        model.save(self.args.track2vec_model_file)
         # inference doesn't work properly unless we load the model from disk
-        model = gensim.models.Word2Vec.load(self.args.model_file)
+        model = gensim.models.Word2Vec.load(self.args.track2vec_model_file)
         for track_id in self.config["data"]["test_track_ids"]:
             print(
                 f"\u001b]8;;{self.tracks[track_id]['url']}\u001b\\{self.tracks[track_id]['artist']} - {self.tracks[track_id]['title']}\u001b]8;;\u001b\\"
@@ -78,7 +78,7 @@ if __name__ == "__main__":
         --playlists_file (str): Path to the deduplicated playlists CSV file. Default is "data/playlists_dedup.csv".
         --tracks_file (str): Path to the deduplicated tracks CSV file. Default is "data/tracks_dedup.csv".
         --max_workers (int): Maximum number of cores to use. Default is the number of cores on the machine.
-        --model_file (str): Path to the model save file without extension. Default is "models/track2vec".
+        --track2vec_model_file (str): Path to the model save file without extension. Default is "models/track2vec".
 
     Returns:
         None
@@ -127,6 +127,7 @@ if __name__ == "__main__":
     model = gensim.models.Word2Vec(
         sentences=playlists,
         compute_loss=True,
+        min_count=1,
         workers=args.max_workers,
         callbacks=[logger],
         **config["model"],
@@ -134,4 +135,4 @@ if __name__ == "__main__":
 
     for track in logger.tracks:
         logger.tracks[track] = model.wv[track]
-    pickle.dump(logger.tracks, open(f"{args.model_file}.p", "wb"))
+    pickle.dump(logger.tracks, open(f"{args.track2vec_model_file}.p", "wb"))

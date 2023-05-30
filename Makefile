@@ -25,18 +25,18 @@ $(DATA_DIR)/users.csv:
 
 .PHONY: playlists
 playlists: ## Get user playlist IDs from Spotify
-$(DATA_DIR)/playlist_details.csv: $(DATA_DIR)/users.csv
-	python train/get_playlists.py --limit=$(LIMIT_PLAYLISTS) --users_file=$(DATA_DIR)/users.csv --playlists_file=$(DATA_DIR)/playlists.csv --playlist_details_file==$(DATA_DIR)/playlist_details.csv
+$(DATA_DIR)/playlists.csv: $(DATA_DIR)/users.csv
+	python train/get_playlists.py --limit=$(LIMIT_PLAYLISTS) --users_file=$(DATA_DIR)/users.csv --playlists_file=$(DATA_DIR)/playlists.csv
 
 .PHONY: tracks
 tracks: $(DATA_DIR)/tracks.csv ## Get playlist track IDs from Spotify
-$(DATA_DIR)/tracks.csv: $(DATA_DIR)/playlists.csv
-	python train/get_tracks.py --max_workers=$(MAX_WORKERS) --proxy=$(PROXY) --playlists_file=$(DATA_DIR)/playlist_details.csv --tracks_file=$(DATA_DIR)/tracks.csv
+$(DATA_DIR)/tracks.csv $(DATA_DIR)/playlist_details.csv: $(DATA_DIR)/playlists.csv
+	python train/get_tracks.py --max_workers=$(MAX_WORKERS) --proxy=$(PROXY) --playlists_file=$(DATA_DIR)/playlists.csv --playlist_details_file=$(DATA_DIR)/playlist_details.csv --tracks_file=$(DATA_DIR)/tracks.csv
 
 .PHONY: deduplicate
 deduplicate: $(DATA_DIR)/tracks_dedup.csv $(DATA_DIR)/playlists_dedup.csv ## Deduplicate tracks
 $(DATA_DIR)/tracks_dedup.csv $(DATA_DIR)/playlists_dedup.csv: $(DATA_DIR)/playlist_details.csv $(DATA_DIR)/tracks.csv
-	python train/deduplicate.py --deduped_tracks_file=$(DATA_DIR)/tracks_dedup.csv --deduped_playlists_file=$(DATA_DIR)/playlists_dedup.csv --min_count=$(MIN_COUNT) --tracks_file=$(DATA_DIR)/tracks.csv --playlists_file=$(DATA_DIR)/playlist_details.csv
+	python train/deduplicate.py --dedup_tracks_file=$(DATA_DIR)/tracks_dedup.csv --dedup_playlists_file=$(DATA_DIR)/playlists_dedup.csv --min_count=$(MIN_COUNT) --tracks_file=$(DATA_DIR)/tracks.csv --playlists_file=$(DATA_DIR)/playlist_details.csv
 
 .PHONY: search
 search: $(DATA_DIR)/tracks_dedup.csv ## Search for track IDs to use for testing in config/track2vec.yaml and config/mp3tovec.yaml
@@ -70,7 +70,7 @@ $(MODELS_DIR)/mp3tovec.ckpt: $(SPECTROGRAMS_DIR)/ $(MODELS_DIR)/track2vec $(DATA
 .PHONY: mp3tovecs
 mp3tovecs: $(MODELS_DIR)/mp3tovecs.p ## Calculate MP3ToVec embeddings for the previews
 $(MODELS_DIR)/mp3tovecs.p: $(PREVIEWS_DIR)/ $(MODELS_DIR)/mp3tovec.ckpt
-	python train/calc_mp3tovecs.py --max_workers=$(MAX_WORKERS) --mp3tovec_model_file=$(MODELS_DIR)/mp3tovec --mp3tovecs_file=$(MODELS_DIR)/mp3tovecs.p --mp3s_dir=$(PREVIEWS_DIR)
+	python train/calc_mp3tovecs.py --max_workers=$(MAX_WORKERS) --mp3tovec_model_file=$(MODELS_DIR)/mp3tovec.ckpt --mp3tovecs_file=$(MODELS_DIR)/mp3tovecs.p --mp3s_dir=$(PREVIEWS_DIR)
 
 .PHONY: tfidf
 tfidf: $(MODELS_DIR)/mp3tovec.p ## Calculate MP3ToVec embedding per preview using TF-IDF
