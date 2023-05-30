@@ -27,7 +27,7 @@ if __name__ == "__main__":
         "--deejai_model_dir",
         type=str,
         default="../deej-ai.online-dev/model",
-        help="defj-ai.online model directory",
+        help="deej-ai.online model directory",
     )
     parser.add_argument(
         "--mp3tovec_model_file",
