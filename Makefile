@@ -63,7 +63,7 @@ $(SPECTROGRAMS_DIR)/: $(PREVIEWS_DIR)/
 	python train/calc_spectrograms.py --max_workers=$(MAX_WORKERS) --previews_dir=$(PREVIEWS_DIR) --spectrograms_dir=$(SPECTROGRAMS_DIR)
 
 .PHONY: mp3tovec
-mp3tovec: $(MODELS_DIR)/mp3tovec ## Train MP3ToVec model
+mp3tovec: $(MODELS_DIR)/mp3tovec.ckpt ## Train MP3ToVec model
 $(MODELS_DIR)/mp3tovec.ckpt: $(SPECTROGRAMS_DIR)/ $(MODELS_DIR)/track2vec $(DATA_DIR)/tracks_dedup.csv
 	python train/train_mp3tovec.py --spectrograms_dir=$(SPECTROGRAMS_DIR) --track2vec_model_file=$(MODELS_DIR)/track2vec --tracks_file=$(DATA_DIR)/tracks_dedup.csv --mp3tovec_model_dir=$(MODELS_DIR)
 
