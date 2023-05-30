@@ -15,7 +15,7 @@ if __name__ == "__main__":
         --deejai_model_dir (str): Path to the deej-ai.online model directory. Default is "../deej-ai.online-dev/model".
         --mp3tovec_model_file (str): Path to the MP3ToVec model file. Default is "models/mp3tovec.ckpt".
         --mp3tovec_file (str): Path to the MP3ToVec file. Default is "models/mp3tovec.p".
-        --old_spotify_tracks_file (str): Optionally merge old track metdata for backwards compatibility. Default is None.
+        --old_deejai_model_dir (str): Optionally merge old track metdata for backwards compatibility. Default is None.
         --track2vec_file (str): Path to the Track2Vec file. Default is "models/track2vec.p".
         --tracks_file (str): Path to the tracks CSV file. Default is "data/tracks.csv".
 
@@ -42,10 +42,10 @@ if __name__ == "__main__":
         help="MP3ToVec file",
     )
     parser.add_argument(
-        "--old_spotify_tracks_file",
+        "--old_deejai_model_dir",
         type=str,
         default=None,
-        help="Old Spotify tracks file (optional)",
+        help="Merge old track metadata (optional)",
     )
     parser.add_argument(
         "--track2vec_file",
@@ -74,12 +74,12 @@ if __name__ == "__main__":
     for track_id in to_delete:
         del spotify2vec[track_id]
 
+    spotify_tracks = {}
     spotify_urls = {}
-    spotify_tracks = (
-        pickle.load(open(args.old_spotify_tracks_file, "rb"))
-        if args.old_spotify_tracks_file is not None
-        else {}
-    )
+    if args.old_deejai_model_dir is not None:
+        spotify_tracks = pickle.load(open(os.path.join(args.old_deejai_model_dir, "spotify_tracks.p"), "rb"))
+        spotify_urls = pickle.load(open(os.path.join(args.old_deejai_model_dir, "spotify_urls.p"), "rb"))
+
     for track_id in common_tracks:
         spotify_urls[track_id] = tracks[track_id]["url"]
         spotify_tracks[
