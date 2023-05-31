@@ -38,6 +38,7 @@ def main():
         --mp3tovec_model_file (str): Path to the MP3ToVec model file. Default is "models/mp3tovec.ckpt".
         --mp3tovecs_file (str): Path to the output file where the MP3ToVec vectors will be saved. Default is "models/mp3tovecs.p".
         --mp3s_dir (str): Path to the directory containing the MP3 files to be encoded. Default is "previews".
+        --recursive (bool): Whether to recursively search for MP3 files in subdirectories. Default is False.
     """
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -65,6 +66,12 @@ def main():
         help="Directory of MP3 files",
     )
     parser.add_argument(
+        "--recursive",
+        type=bool,
+        default=False,
+        help="Process MP3s in subdirectories recursively",
+    )
+    parser.add_argument(
         "--save_every",
         type=int,
         default=1000,
@@ -86,14 +93,28 @@ def main():
         else {}
     )
 
+    if args.recursive:
+        formats = set([".mp3", ".wav", ".m4a", ".flac"])
+        mp3_files = [
+            os.path.join(root, file)
+            for root, _, files in os.walk(args.mp3s_dir)
+            for file in files
+            if file[file.rfind(".") :].lower() in formats
+        ]
+        extension = None
+        args.mp3s_dir = ""
+    else:
+        mp3_files = os.listdir(args.mp3s_dir)
+        extension = -len(".mp3")
+
     torch.multiprocessing.set_start_method("spawn")
     with concurrent.futures.ProcessPoolExecutor(
         max_workers=args.max_workers
     ) as executor:
         futures = {
             executor.submit(encode_file, model, mp3_file, args.mp3s_dir): mp3_file
-            for mp3_file in tqdm(os.listdir(args.mp3s_dir), desc="Setting up jobs")
-            if f"{mp3_file[:-len('.mp3')]}" not in mp3tovecs and sleep(1e-4) is None
+            for mp3_file in tqdm(mp3_files, desc="Setting up jobs")
+            if f"{mp3_file[:extension]}" not in mp3tovecs and sleep(1e-4) is None
         }
         for i, future in enumerate(
             tqdm(
@@ -104,7 +125,7 @@ def main():
         ):
             mp3_file = futures[future]
             try:
-                mp3tovecs[mp3_file[: -len(".mp3")]] = future.result()
+                mp3tovecs[mp3_file[:extension]] = future.result()
                 if (i + 1) % args.save_every == 0:
                     pickle.dump(mp3tovecs, open(args.mp3tovecs_file, "wb"))
             except KeyboardInterrupt:

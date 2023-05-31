@@ -246,34 +246,37 @@ def get_mp3tovec(content_string, filename):
     K.clear_session()
     print(f'Spectrogram analysis took {time.time() - start:0.0f}s')
     start = time.time()
-    mp3s = {}
-    dropout = batch_size / len(mp3tovec) # only process a selection of MP3s
-    for vec in mp3tovec:
-        if random.uniform(0, 1) > dropout:
-            continue
-        pickle_filename = (vec[:-3]).replace('\\', '_').replace('/', '_').replace(':','_') + 'p'
-        try:
-            unpickled = pickle.load(open(dump_directory + '/' + pickle_filename, 'rb'))
-        except:
-            pickle_filename = pickle_filename.encode('ISO8859-1', 'replace').decode('ascii', 'surrogateescape')
-            unpickled = pickle.load(open(dump_directory + '/' + pickle_filename, 'rb'))
-        mp3s[unpickled[0]] = unpickled[1]
-    new_idfs = []
-    for vec_i in new_vecs:
-        idf = 1 # because each new vector is in the new mp3 by definition
-        for mp3 in mp3s:
-            for vec_j in mp3s[mp3]:
+    try:
+        mp3s = {}
+        dropout = batch_size / len(mp3tovec) # only process a selection of MP3s
+        for vec in mp3tovec:
+            if random.uniform(0, 1) > dropout:
+                continue
+            pickle_filename = (vec[:-3]).replace('\\', '_').replace('/', '_').replace(':','_') + 'p'
+            try:
+                unpickled = pickle.load(open(dump_directory + '/' + pickle_filename, 'rb'))
+            except:
+                pickle_filename = pickle_filename.encode('ISO8859-1', 'replace').decode('ascii', 'surrogateescape')
+                unpickled = pickle.load(open(dump_directory + '/' + pickle_filename, 'rb'))
+            mp3s[unpickled[0]] = unpickled[1]
+        new_idfs = []
+        for vec_i in new_vecs:
+            idf = 1 # because each new vector is in the new mp3 by definition
+            for mp3 in mp3s:
+                for vec_j in mp3s[mp3]:
+                    if 1 - np.dot(vec_i, vec_j) / (np.linalg.norm(vec_i) * np.linalg.norm(vec_j)) < epsilon_distance:
+                        idf += 1
+                        break
+            new_idfs.append(-np.log(idf / (len(mp3s) + 1))) # N + 1
+        vec = 0
+        for i, vec_i in enumerate(new_vecs):
+            tf_ = 0
+            for vec_j in new_vecs:
                 if 1 - np.dot(vec_i, vec_j) / (np.linalg.norm(vec_i) * np.linalg.norm(vec_j)) < epsilon_distance:
-                    idf += 1
-                    break
-        new_idfs.append(-np.log(idf / (len(mp3s) + 1))) # N + 1
-    vec = 0
-    for i, vec_i in enumerate(new_vecs):
-        tf_ = 0
-        for vec_j in new_vecs:
-            if 1 - np.dot(vec_i, vec_j) / (np.linalg.norm(vec_i) * np.linalg.norm(vec_j)) < epsilon_distance:
-                tf_ += 1
-        vec += vec_i * tf_ * new_idfs[i]
+                    tf_ += 1
+            vec += vec_i * tf_ * new_idfs[i]
+    except:
+        vec = np.mean(new_vecs, axis=0)
     similar = most_similar_by_vec([vec], topn=1, noise=0)
     print(f'TF-IDF analysis took {time.time() - start:0.0f}s')
     return similar[0][0]
