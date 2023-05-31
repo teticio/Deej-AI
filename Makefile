@@ -63,7 +63,7 @@ $(SPECTROGRAMS_DIR)/done: $(PREVIEWS_DIR)/done
 	@touch $(SPECTROGRAMS_DIR)/done
 
 .PHONY: mp3tovec
-mp3tovec: $(MODELS_DIR)/mp3tovec ## Train MP3ToVec model
+mp3tovec: $(MODELS_DIR)/mp3tovec.ckpt ## Train MP3ToVec model
 $(MODELS_DIR)/mp3tovec.ckpt: $(SPECTROGRAMS_DIR)/done $(MODELS_DIR)/track2vec $(DATA_DIR)/tracks_dedup.csv
 	python train/train_mp3tovec.py --spectrograms_dir=$(SPECTROGRAMS_DIR) --track2vec_model_file=$(MODELS_DIR)/track2vec --tracks_file=$(DATA_DIR)/tracks_dedup.csv --mp3tovec_model_dir=$(MODELS_DIR)
 
