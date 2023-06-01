@@ -49,27 +49,27 @@ $(MODELS_DIR)/track2vec: $(DATA_DIR)/tracks_dedup.csv $(DATA_DIR)/playlists_dedu
 	python train/train_track2vec.py --max_workers=$(MAX_WORKERS) --tracks_file=$(DATA_DIR)/tracks_dedup.csv --playlists_file=$(DATA_DIR)/playlists_dedup.csv --track2vec_model_file=$(MODELS_DIR)/track2vec
 
 .PHONY: download
-download: $(PREVIEWS_DIR)/ ## Download 30 second previews
-$(PREVIEWS_DIR)/: $(DATA_DIR)/tracks_dedup.csv 
+download: $(PREVIEWS_DIR)/done ## Download 30 second previews
+$(PREVIEWS_DIR)/done: $(DATA_DIR)/tracks_dedup.csv 
 	@mkdir -p $(PREVIEWS_DIR)
-	@touch $(PREVIEWS_DIR)
 	python train/download_previews.py --max_workers=$(MAX_WORKERS) --tracks_file=$(DATA_DIR)/tracks_dedup.csv --previews_dir=$(PREVIEWS_DIR)
+	@touch $(PREVIEWS_DIR)/done
 
 .PHONY: spectrograms
-spectrograms: $(SPECTROGRAMS_DIR)/ ## Generate spectrograms for first audio slice of each preview
-$(SPECTROGRAMS_DIR)/: $(PREVIEWS_DIR)/
+spectrograms: $(SPECTROGRAMS_DIR)/done ## Generate spectrograms for first audio slice of each preview
+$(SPECTROGRAMS_DIR)/done: $(PREVIEWS_DIR)/done
 	@mkdir -p $(SPECTROGRAMS_DIR)
-	@touch $(SPECTROGRAMS_DIR)
 	python train/calc_spectrograms.py --max_workers=$(MAX_WORKERS) --previews_dir=$(PREVIEWS_DIR) --spectrograms_dir=$(SPECTROGRAMS_DIR)
+	@touch $(SPECTROGRAMS_DIR)/done
 
 .PHONY: mp3tovec
 mp3tovec: $(MODELS_DIR)/mp3tovec.ckpt ## Train MP3ToVec model
-$(MODELS_DIR)/mp3tovec.ckpt: $(SPECTROGRAMS_DIR)/ $(MODELS_DIR)/track2vec $(DATA_DIR)/tracks_dedup.csv
+$(MODELS_DIR)/mp3tovec.ckpt: $(SPECTROGRAMS_DIR)/done $(MODELS_DIR)/track2vec $(DATA_DIR)/tracks_dedup.csv
 	python train/train_mp3tovec.py --spectrograms_dir=$(SPECTROGRAMS_DIR) --track2vec_model_file=$(MODELS_DIR)/track2vec --tracks_file=$(DATA_DIR)/tracks_dedup.csv --mp3tovec_model_dir=$(MODELS_DIR)
 
 .PHONY: mp3tovecs
 mp3tovecs: $(MODELS_DIR)/mp3tovecs.p ## Calculate MP3ToVec embeddings for the previews
-$(MODELS_DIR)/mp3tovecs.p: $(PREVIEWS_DIR)/ $(MODELS_DIR)/mp3tovec.ckpt
+$(MODELS_DIR)/mp3tovecs.p: $(PREVIEWS_DIR)/done $(MODELS_DIR)/mp3tovec.ckpt
 	python train/calc_mp3tovecs.py --max_workers=$(MAX_WORKERS) --mp3tovec_model_file=$(MODELS_DIR)/mp3tovec.ckpt --mp3tovecs_file=$(MODELS_DIR)/mp3tovecs.p --mp3s_dir=$(PREVIEWS_DIR)
 
 .PHONY: tfidf

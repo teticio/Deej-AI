@@ -83,7 +83,8 @@ def main():
                 mel,
             ): mp3_file
             for mp3_file in tqdm(mp3_files, desc="Setting up jobs")
-            if f"{mp3_file[: -len('.mp3')]}.png" not in already_done
+            if mp3_file.endswith(".mp3")
+            and f"{mp3_file[: -len('.mp3')]}.png" not in already_done
             and sleep(1e-4) is None
         }
         for future in tqdm(
