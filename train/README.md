@@ -8,7 +8,7 @@ You can run `make help` from the project root directory. If you run
 make install COOKIE=... USER=... MAX_WORKERS=1 PROXY=
 ```
 
-then by default it will make all the steps below necessary to create the datasets, train the models and install them to the `../deej-ai.online-dev/model`. You will need to specify the `sp_dc` cookie and Spotify user to start from (see below). You will also need to ensure taht the `test_track_ids` in the `config/track2vec.yaml` and `config/mp3tovec.yaml` files are present by searching in the `data/tracks_dedup.csv` file. The workflow would typically be
+then by default it will make all the steps below necessary to create the datasets, train the models and install them to the `../deej-ai.online-dev/model`. You will need to specify the `sp_dc` cookie and Spotify user to start from (see below). You will also need to ensure that the `test_track_ids` in the `config/track2vec.yaml` and `config/mp3tovec.yaml` files are present by searching in the `data/tracks_dedup.csv` file. The workflow would typically be
 
 ```bash
 # Create datasets
