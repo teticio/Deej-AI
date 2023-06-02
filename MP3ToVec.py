@@ -3,7 +3,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 import tensorflow as tf
-from keras.models import load_model
+from tensorflow.keras.models import load_model
 import os
 import numpy as np
 import librosa
@@ -52,8 +52,8 @@ if __name__ == '__main__':
         sr         = 22050
         n_fft      = 2048
         hop_length = 512
-        n_mels     = model.layers[0].input_shape[0][1]
-        slice_size = model.layers[0].input_shape[0][2]
+        n_mels     = model.input_shape[1]
+        slice_size = model.input_shape[2]
         slice_time = slice_size * hop_length / sr
         files = []
         done = os.listdir(dump_directory)
