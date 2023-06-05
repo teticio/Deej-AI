@@ -124,7 +124,7 @@ def main() -> None:
     parser.add_argument(
         "--batch_size",
         type=int,
-        default=100,
+        default=1000,
         help="Batch size for TF-IDF calculation",
     )
     parser.add_argument(
