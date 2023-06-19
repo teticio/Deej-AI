@@ -109,6 +109,3 @@ The `spotifytovec.p`, `tracktovec.p`, `spotify_tracks.p`, `spotify_urls.p` and `
 ```bash
 python train/install_model.py
 ```
-
-# TODO
-* Makefile
