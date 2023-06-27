@@ -1,7 +1,7 @@
 dash
 tqdm
 mutagen
-Flask~=1.0
+Flask~=2.2
 spotipy
 librosa
 dash_core_components==0.47.0

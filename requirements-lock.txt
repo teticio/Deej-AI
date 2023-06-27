@@ -16,7 +16,7 @@ dash-html-components==0.16.0
 dash-renderer==0.23.0
 dash-table==3.6.0
 decorator==5.1.1
-Flask==2.2.2
+Flask==2.2.5
 Flask-Compress==1.13
 flatbuffers==22.11.23
 gast==0.4.0

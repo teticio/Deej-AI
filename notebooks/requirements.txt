@@ -27,7 +27,7 @@ decorator==4.4.2
 distlib==0.3.0
 distro==1.4.0
 docutils==0.15.2
-Flask==1.0.2
+Flask==2.2.5
 Flask-Compress==1.5.0
 flatbuffers==23.5.26
 gast==0.3.3
