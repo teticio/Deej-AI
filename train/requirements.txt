@@ -7,5 +7,5 @@ lightning
 pyyaml
 requests
 spotipy
-tensorflow==2.9.1
+tensorflow==2.11.1
 tqdm
