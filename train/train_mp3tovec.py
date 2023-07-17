@@ -272,12 +272,18 @@ if __name__ == "__main__":
     track2vec_model = gensim.models.Word2Vec.load(args.track2vec_model_file)
     tracks = read_tracks(args.tracks_file)
     test_track_ids = config["data"]["test_track_ids"]
-    test_batch = torch.stack(
-        [
-            image_to_tensor(os.path.join(args.spectrograms_dir, f"{test_track_id}.png"))
-            for test_track_id in test_track_ids
-        ]
-    ) if len(test_track_ids) > 0 else torch.Tensor()
+    test_batch = (
+        torch.stack(
+            [
+                image_to_tensor(
+                    os.path.join(args.spectrograms_dir, f"{test_track_id}.png")
+                )
+                for test_track_id in test_track_ids
+            ]
+        )
+        if len(test_track_ids) > 0
+        else torch.Tensor()
+    )
     test_callback = TestCallback(tracks, track2vec_model, test_track_ids, test_batch)
     checkpoint_callback = ModelCheckpoint(
         save_top_k=1,

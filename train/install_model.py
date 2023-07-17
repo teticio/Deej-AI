@@ -77,8 +77,12 @@ if __name__ == "__main__":
     spotify_tracks = {}
     spotify_urls = {}
     if args.old_deejai_model_dir is not None:
-        spotify_tracks = pickle.load(open(os.path.join(args.old_deejai_model_dir, "spotify_tracks.p"), "rb"))
-        spotify_urls = pickle.load(open(os.path.join(args.old_deejai_model_dir, "spotify_urls.p"), "rb"))
+        spotify_tracks = pickle.load(
+            open(os.path.join(args.old_deejai_model_dir, "spotify_tracks.p"), "rb")
+        )
+        spotify_urls = pickle.load(
+            open(os.path.join(args.old_deejai_model_dir, "spotify_urls.p"), "rb")
+        )
 
     for track_id in common_tracks:
         spotify_urls[track_id] = tracks[track_id]["url"]

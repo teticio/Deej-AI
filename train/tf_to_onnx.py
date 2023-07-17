@@ -105,25 +105,33 @@ if __name__ == "__main__":
 
     pytorch_model.eval()
     pytorch_model.load_state_dict(new_state_dict, strict=False)
-    
+
     dummy_input = torch.randn(1, 1, 96, 216)
-    dynamic_axes = {'input': {0: 'batch_size'},    # variable length axes
-                    'output' : {0 : 'batch_size'}}  # Map dynamic axis to its name
-    torch.onnx.export(pytorch_model,
-                      dummy_input,
-                      args.onnx_model_file,
-                      input_names = ['input'],
-                      output_names = ['output'],
-                      dynamic_axes=dynamic_axes)
+    dynamic_axes = {
+        "input": {0: "batch_size"},  # variable length axes
+        "output": {0: "batch_size"},
+    }  # Map dynamic axis to its name
+    torch.onnx.export(
+        pytorch_model,
+        dummy_input,
+        args.onnx_model_file,
+        input_names=["input"],
+        output_names=["output"],
+        dynamic_axes=dynamic_axes,
+    )
 
     # test
     np.random.seed(42)
-    ort_session = ort.InferenceSession(args.onnx_model_file, providers=["CPUExecutionProvider"])
+    ort_session = ort.InferenceSession(
+        args.onnx_model_file, providers=["CPUExecutionProvider"]
+    )
     example = np.random.random_sample((1, 96, 216, 1))
     with torch.no_grad():
         assert (
             np.abs(
-                ort_session.run(None, {"input": Tensor(example).permute(0, 3, 1, 2).numpy()})
+                ort_session.run(
+                    None, {"input": Tensor(example).permute(0, 3, 1, 2).numpy()}
+                )
                 - model(example).numpy()
             ).max()
             < 2e-3
