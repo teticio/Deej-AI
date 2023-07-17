@@ -136,19 +136,16 @@ if __name__ == '__main__':
                 mp3_vecs.append(mp3_vec / np.linalg.norm(mp3_vec)) # normalize
         num_mp3_vecs = len(mp3_vecs)
         # this takes up a lot of memory
-        cos_distances = np.ndarray((num_mp3_vecs, num_mp3_vecs), dtype=np.float16)
+        cos_distances = np.zeros((num_mp3_vecs, num_mp3_vecs), dtype=np.float16)
         print(f'Precalculating cosine distances')
         # this needs speeding up
         try:
             with tqdm(mp3_vecs, unit="vector") as t:
                 for i, mp3_vec_i in enumerate(t):
                     for j , mp3_vec_j in enumerate(mp3_vecs):
-                        if i > j:
-                            cos_distances[i, j] = cos_distances[j, i] # I've been here before
-                        elif i < j:
+                        if i < j:
                             cos_distances[i, j] = 1 - np.dot(mp3_vec_i, mp3_vec_j)
-                        else:
-                            cos_distances[i, j] = 0 # i == j
+            cos_distances = cos_distances + cos_distances.T - np.diag(np.diag(cos_distances)) # Make matrix symmetrical diagonally
         except KeyboardInterrupt:
             t.close() # stop the progress bar from sprawling all over the place after a keyboard interrupt
             raise

@@ -25,12 +25,14 @@ def most_similar(positive=[], negative=[], topn=5, noise=0):
         negative = [negative] # broadcast to list
     mp3_vec_i = np.sum([mp3tovec[i] for i in positive] + [-mp3tovec[i] for i in negative], axis=0)
     mp3_vec_i += np.random.normal(0, noise * np.linalg.norm(mp3_vec_i), len(mp3_vec_i))
+    mp3_vec_i_norm = np.linalg.norm(mp3_vec_i) # precalculate norms for mp3_vec_i
     similar = []
     for track_j in mp3tovec:
         if track_j in positive or track_j in negative:
             continue
         mp3_vec_j = mp3tovec[track_j]
-        cos_proximity = np.dot(mp3_vec_i, mp3_vec_j) / (np.linalg.norm(mp3_vec_i) * np.linalg.norm(mp3_vec_j))
+        mp3_vec_j_norm = mp3_vec_j_norms[track_j]
+        cos_proximity = np.dot(mp3_vec_i, mp3_vec_j) / (mp3_vec_i_norm * mp3_vec_j_norm)
         similar.append((track_j, cos_proximity))
     return sorted(similar, key=lambda x:-x[1])[:topn]
 
@@ -41,10 +43,12 @@ def most_similar_by_vec(positive=[], negative=[], topn=5, noise=0):
         negative = [negative] # broadcast to list
     mp3_vec_i = np.sum([i for i in positive] + [-i for i in negative], axis=0)
     mp3_vec_i += np.random.normal(0, noise * np.linalg.norm(mp3_vec_i), len(mp3_vec_i))
+    mp3_vec_i_norm = np.linalg.norm(mp3_vec_i) # precalculate norms for mp3_vec_i
     similar = []
     for track_j in mp3tovec:
         mp3_vec_j = mp3tovec[track_j]
-        cos_proximity = np.dot(mp3_vec_i, mp3_vec_j) / (np.linalg.norm(mp3_vec_i) * np.linalg.norm(mp3_vec_j))
+        mp3_vec_j_norm = mp3_vec_j_norms[track_j]
+        cos_proximity = np.dot(mp3_vec_i, mp3_vec_j) / (mp3_vec_i_norm * mp3_vec_j_norm)
         similar.append((track_j, cos_proximity))
     return sorted(similar, key=lambda x:-x[1])[:topn]
 
@@ -93,6 +97,9 @@ if __name__ == '__main__':
     mix_filename = args.output
     n = args.n
     mp3tovec = pickle.load(open(mp3tovec_filename, 'rb'))
+    mp3_vec_j_norms = {} # precalculate norms for mp3_vec_j
+    for track_j in mp3tovec:
+        mp3_vec_j_norms[track_j] = np.linalg.norm(mp3tovec[track_j])
     noise = 0
     if args.noise is not None:
         noise = args.noise
