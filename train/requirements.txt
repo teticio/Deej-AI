@@ -4,6 +4,9 @@ gensim
 huggingface-hub
 pandas
 lightning
+onnx
+onnxruntime
+protobuf==3.19.6
 pyyaml
 requests
 spotipy
