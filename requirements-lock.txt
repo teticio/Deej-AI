@@ -42,7 +42,7 @@ oauthlib==3.2.2
 opt-einsum==3.3.0
 packaging==21.3
 pandas==1.5.2
-Pillow==9.3.0
+Pillow==10.0.1
 plotly==5.11.0
 pooch==1.6.0
 protobuf==3.19.6
