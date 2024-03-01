@@ -20,7 +20,7 @@ Cython==0.29.14
 dash==0.42.0
 dash-core-components==0.47.0
 dash-daq==0.1.4
-dash-html-components==0.16.0
+dash-html-components==2.0.0
 dash-renderer==0.23.0
 dash-table==3.6.0
 decorator==4.4.2
