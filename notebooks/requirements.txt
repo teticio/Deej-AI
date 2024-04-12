@@ -38,7 +38,7 @@ google-pasta==0.2.0
 grpcio==1.54.2
 h5py==2.10.0
 html5lib==1.0.1
-idna==2.10
+idna==3.7
 importlib-metadata==6.6.0
 ipaddr==2.2.0
 ipykernel==5.3.4
