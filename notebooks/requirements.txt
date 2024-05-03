@@ -115,7 +115,7 @@ termcolor==1.1.0
 threadpoolctl==2.1.0
 toml==0.10.2
 tornado==6.0.4
-tqdm==4.31.1
+tqdm==4.66.3
 traitlets==5.0.4
 typing-extensions==3.7.4.3
 umap-learn==0.4.6

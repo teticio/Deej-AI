@@ -71,7 +71,7 @@ tensorflow-estimator==2.11.0
 tensorflow-io-gcs-filesystem==0.28.0
 termcolor==2.1.1
 threadpoolctl==3.1.0
-tqdm==4.64.1
+tqdm==4.66.3
 typing_extensions==4.4.0
 urllib3==1.26.13
 Werkzeug==2.2.2
