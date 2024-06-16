@@ -1,4 +1,5 @@
 .vscode
+venv-deej-ai
 lib/
 lib64
 bin/
