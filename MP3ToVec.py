@@ -15,7 +15,7 @@ import random
 def walkmp3s(folder):
     for dirpath, dirs, files in os.walk(folder, topdown=False):
         for filename in files:
-            if filename[-3:].lower() == 'mp3' or filename[-3:].lower() == 'm4a':
+            if filename.lower().endswith(('.flac', '.mp3', '.m4a')):
                 yield filename, os.path.abspath(os.path.join(dirpath, filename))
 
 if __name__ == '__main__':
@@ -58,7 +58,7 @@ if __name__ == '__main__':
         files = []
         done = os.listdir(dump_directory)
         for filename, full_path in walkmp3s(mp3_directory):
-            pickle_filename = (full_path[:-3]).replace('\\', '_').replace('/', '_').replace(':','_') + 'p'
+            pickle_filename = os.path.splitext(full_path)[0].replace('\\', '_').replace('/', '_').replace(':','_') + '.p'
             if pickle_filename in done:
                 continue
             files.append((pickle_filename, full_path))
