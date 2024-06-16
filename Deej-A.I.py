@@ -10,6 +10,7 @@ from flask import send_from_directory
 from io import BytesIO
 from mutagen.mp3 import MP3
 from mutagen.mp4 import MP4
+from mutagen.flac import FLAC, Picture
 from mutagen.id3 import ID3, ID3NoHeaderError
 from PIL import Image
 import base64
@@ -320,6 +321,22 @@ def get_track_info(filename):
             track = audio.get('\xa9nam')[0]
         if audio.get('\xa9alb') is not None:
             album = audio.get('\xa9alb')[0]
+        duration = audio.info.length
+    elif filename[-4:].lower() == 'flac':
+        audio = FLAC(filename)
+        if audio.pictures:
+            for pict in pics:
+                if pict.type == 3:
+                    im = Image.open(BytesIO(pict.data)).convert('RGB')
+                    buff = BytesIO()
+                    im.save(buff, format='jpeg')
+                    artwork = base64.b64encode(buff.getvalue()).decode('utf-8')
+        if audio.get('ARTIST') is not None:
+            artist = audio.get('ARTIST')[0]
+        if audio.get('TITLE') is not None:
+            track = audio.get('TITLE')[0]
+        if audio.get('ALBUM') is not None:
+            album = audio.get('ALBUM')[0]
         duration = audio.info.length
     if artwork == None:
         artwork = base64.b64encode(open('./static/record.jpg', 'rb').read()).decode()
