@@ -490,16 +490,16 @@ if __name__ == '__main__':
         app.run_server(threaded=False, debug=False)
     else:
         if input_song != None:
-            print("Outfile playlist: {}".format(playlist_outfile))
-            print("Input song selected: {}".format(input_song))
-            print("Requested {} songs".format(n_songs))
-
             if n_songs == None:
                 n_songs = default_playlist_size
             if noise == None:
                 noise = default_noise
             if lookback == None:
                 lookback = default_lookback
+
+            print("Outfile playlist: {}".format(playlist_outfile))
+            print("Input song selected: {}".format(input_song))
+            print("Requested {} songs".format(n_songs))
 
             tracks = make_playlist([input_song], size=n_songs + 1, noise=noise, lookback=lookback)
             tracks_to_m3u(playlist_outfile, tracks)

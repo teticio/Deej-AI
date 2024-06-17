@@ -80,7 +80,7 @@ If you are interested in the data I used to train the neural network, feel free 
 
 Optionally you can generate an ```.m3u``` file with relative path to export the playlist and play it on another device.
 
-The playlist file uses relative paths. So if you specifiy `--playlist` as `/home/user/playlists/playlist_outfile.m3u` and one of it's tracks is located at `home/user/music/some_awesome_music.mp3` the resulting playlist will write that track out as `../music/some_awesome_music.mp3`.
+The playlist file uses relative paths. So if you specifiy `--playlist` as `/home/user/playlists/playlist_outfile.m3u` and one of its tracks is located at `/home/user/music/some_awesome_music.mp3` the resulting playlist will write that track out as `../music/some_awesome_music.mp3`.
 
 Run with:
 
