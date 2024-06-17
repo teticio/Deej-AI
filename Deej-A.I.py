@@ -427,15 +427,28 @@ def update_output(contents, jsonified_data, filename, lookback, noise):
     time.sleep(1)
     return [upload, shared]
 
+def relative_path(fileout, track):
+    # Determine if fileout is a file or directory
+    if os.path.isdir(fileout):
+        fileout_dir = fileout
+    else:
+        fileout_dir = os.path.dirname(fileout)
+
+    # Compute the relative path from fileout directory to tracks
+    relative = os.path.relpath(track, start=fileout_dir)
+    
+    return relative
 
 def tracks_to_m3u(fileout, tracks):
     """
-    using absolute path
+    using relative path
     """
 
     with open(fileout, 'w') as f:
+        f.write("#EXTM3U\n")
         for item in tracks:
-            f.write(item + "\n")
+            relpath = relative_path(fileout, item)
+            f.write(relpath + "\n")
 
 
 if __name__ == '__main__':
