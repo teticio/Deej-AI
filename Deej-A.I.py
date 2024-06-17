@@ -427,15 +427,28 @@ def update_output(contents, jsonified_data, filename, lookback, noise):
     time.sleep(1)
     return [upload, shared]
 
+def relative_path(fileout, track):
+    # Determine if fileout is a file or directory
+    if os.path.isdir(fileout):
+        fileout_dir = fileout
+    else:
+        fileout_dir = os.path.dirname(fileout)
+
+    # Compute the relative path from fileout directory to tracks
+    relative = os.path.relpath(track, start=fileout_dir)
+    
+    return relative
 
 def tracks_to_m3u(fileout, tracks):
     """
-    using absolute path
+    using relative path
     """
 
     with open(fileout, 'w') as f:
+        f.write("#EXTM3U\n")
         for item in tracks:
-            f.write(item + "\n")
+            relpath = relative_path(fileout, item)
+            f.write(relpath + "\n")
 
 
 if __name__ == '__main__':
@@ -477,16 +490,16 @@ if __name__ == '__main__':
         app.run_server(threaded=False, debug=False)
     else:
         if input_song != None:
-            print("Outfile playlist: {}".format(playlist_outfile))
-            print("Input song selected: {}".format(input_song))
-            print("Requested {} songs".format(n_songs))
-
             if n_songs == None:
                 n_songs = default_playlist_size
             if noise == None:
                 noise = default_noise
             if lookback == None:
                 lookback = default_lookback
+
+            print("Outfile playlist: {}".format(playlist_outfile))
+            print("Input song selected: {}".format(input_song))
+            print("Requested {} songs".format(n_songs))
 
             tracks = make_playlist([input_song], size=n_songs + 1, noise=noise, lookback=lookback)
             tracks_to_m3u(playlist_outfile, tracks)
