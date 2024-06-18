@@ -11,6 +11,8 @@ pandas
 numpy
 dash_html_components
 Pillow
-tensorflow
+tensorflow; sys_platform != 'darwin'
+tensorflow-macos; sys_platform == 'darwin'
+tensorflow-metal; sys_platform == 'darwin'
 numba
 markupsafe==2.0.1
