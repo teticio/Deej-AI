@@ -10,5 +10,5 @@ protobuf==3.19.6
 pyyaml
 requests
 spotipy
-tensorflow==2.9.1
+tensorflow==2.12.1
 tqdm
