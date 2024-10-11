@@ -49,6 +49,7 @@ Another simple idea is to listen to music using a microphone and to propose a se
 Once you have installed the required python packages with
 
 ```bash
+# Requires Python 3.10
 pip install -r requirements.txt
 ```
 
