@@ -95,4 +95,6 @@ It additionally takes optional parameters:
 --nsongs  # Number of songs in the playlist
 --noise   # Amount of noise in the playlist (default 0)
 --lookback # Amount of lookback in the playlist (default 3)
+--skip_duplicates # Skip duplicated tracks based on optional epsilon
+--epsilon # Epsilon distance (default: 0.001)
 ```

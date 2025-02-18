@@ -36,7 +36,7 @@ def most_similar(positive=[], negative=[], topn=5, noise=0):
         similar.append((track_j, cos_proximity))
     return sorted(similar, key=lambda x:-x[1])[:topn]
 
-def most_similar_by_vec(positive=[], negative=[], topn=5, noise=0):
+def most_similar_by_vec(positive=[], negative=[], topn=5, noise=0, skip_duplicates=False):
     if isinstance(positive, str):
         positive = [positive] # broadcast to list
     if isinstance(negative, str):
@@ -52,20 +52,33 @@ def most_similar_by_vec(positive=[], negative=[], topn=5, noise=0):
         similar.append((track_j, cos_proximity))
     return sorted(similar, key=lambda x:-x[1])[:topn]
 
-def make_playlist(seed_tracks, size=10, lookback=3, noise=0):
-    max_tries = 10
+def in_playlist(candidate, playlist):
+    if candidate in playlist:
+        return True
+    for track in playlist:
+        mp3_vec_i = mp3tovec[candidate]
+        mp3_vec_i_norm = np.linalg.norm(mp3_vec_i)
+        mp3_vec_j = mp3tovec[track]
+        mp3_vec_j_norm = np.linalg.norm(mp3_vec_j)
+        cos_proximity = np.dot(mp3_vec_i, mp3_vec_j) / (mp3_vec_i_norm * mp3_vec_j_norm)
+        if cos_proximity > 1 - epsilon_distance:
+            return True
+    return False
+
+def make_playlist(seed_tracks, size=10, lookback=3, noise=0, skip_duplicates=False):
+    max_tries = 100
     playlist = seed_tracks
     while len(playlist) < size:
-        similar = most_similar(positive=playlist[-lookback:], topn=max_tries, noise=noise)
+        similar = most_similar(positive=playlist[-lookback:], topn=max_tries, noise=noise, skip_duplicates=skip_duplicates)
         candidates = [candidate[0] for candidate in similar if candidate[0] != playlist[-1]]
         for candidate in candidates:
-            if not candidate in playlist and get_track_duration(candidate) < max_duration:
+            if not in_playlist(candidate, playlist) and get_track_duration(candidate) < max_duration:
                 break
         playlist.append(candidate)
     return playlist
 
-def join_the_dots(tracks, n=5, noise=0): # create a musical journey between given track "waypoints"
-    max_tries = 10
+def join_the_dots(tracks, n=5, noise=0, skip_duplicates=False): # create a musical journey between given track "waypoints"
+    max_tries = 100
     playlist = []
     end = start = tracks[0]
     start_vec = mp3tovec[start]
@@ -73,10 +86,10 @@ def join_the_dots(tracks, n=5, noise=0): # create a musical journey between give
         end_vec = mp3tovec[end]
         playlist.append(start)
         for i in range(n):
-            similar = most_similar_by_vec(positive=[(n-i+1)/n * start_vec + (i+1)/n * end_vec], topn=max_tries, noise=noise)
+            similar = most_similar_by_vec(positive=[(n-i+1)/n * start_vec + (i+1)/n * end_vec], topn=max_tries, noise=noise, skip_duplicates=skip_duplicates)
             candidates = [candidate[0] for candidate in similar if candidate[0] != playlist[-1]]
             for candidate in candidates:
-                if not candidate in playlist and candidate != end and get_track_duration(candidate) < max_duration:
+                if not in_playlist(candidate, playlist) and candidate != end and get_track_duration(candidate) < max_duration:
                     break
             playlist.append(candidate)
         start = end
@@ -91,6 +104,8 @@ if __name__ == '__main__':
     parser.add_argument('output', type=str, help='Output MP3 filename')
     parser.add_argument('n', type=int, help='Number of songs to add between input songs')
     parser.add_argument('--noise', type=float, help='Degree of randomness (0-1)')
+    parser.add_argument("--skip_duplicates", action="store_true", default=False, help="Skip duplicated tracks based on optional epsilon")
+    parser.add_argument('--epsilon', type=float, help='Epsilon distance (default: 0.001)')
     args = parser.parse_args()
     mp3tovec_filename = args.mp3tovec
     tracks_filename = args.inputs
@@ -103,6 +118,10 @@ if __name__ == '__main__':
     noise = 0
     if args.noise is not None:
         noise = args.noise
+    skip_duplicates = args.skip_duplicates
+    epsilon_distance = args.epsilon
+    if epsilon_distance == None:
+        epsilon_distance = 0.001 # should be small, but not too small
     input_tracks = []
     if tracks_filename is not None:
         with open(tracks_filename, 'rt') as file:
@@ -133,9 +152,9 @@ if __name__ == '__main__':
         tracks = [mp3 for mp3 in mp3tovec]
         input_tracks.append(tracks[random.randint(0, len(tracks))])
     if len(input_tracks) > 1:
-        playlist = join_the_dots(input_tracks, n=n, noise=noise)
+        playlist = join_the_dots(input_tracks, n=n, noise=noise, skip_duplicates=skip_duplicates)
     else:
-        playlist = make_playlist(input_tracks, size=n, lookback=3, noise=noise)
+        playlist = make_playlist(input_tracks, size=n, lookback=3, noise=noise, skip_duplicates=skip_duplicates)
     tracks = []
     for i, track in enumerate(playlist):
         tracks.append('-i')
