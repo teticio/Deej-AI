@@ -95,4 +95,5 @@ It additionally takes optional parameters:
 --nsongs  # Number of songs in the playlist
 --noise   # Amount of noise in the playlist (default 0)
 --lookback # Amount of lookback in the playlist (default 3)
+--epsilon # Epsilon distance (default: 0.001)
 ```
