@@ -479,7 +479,7 @@ if __name__ == '__main__':
     parser.add_argument('--playlist', type=str, help='Write playlist file without starting interface')
     parser.add_argument('--inputsong', type=str, help="Requires --playlist option\nSelects a song to start the playlist with.")
     parser.add_argument("--nsongs", type=int, help="Requires --playlist option\nNumber of songs in the playlist")
-    parser.add_argument("--noise", type=int, help="Requires --playlist option\nAmount of noise in the playlist (default 0)")
+    parser.add_argument("--noise", type=float, help="Requires --playlist option\nAmount of noise in the playlist (default 0)")
     parser.add_argument("--lookback", type=int, help="Requires --playlist option\nAmount of lookback in the playlist (default 3)")
 
     args = parser.parse_args()
